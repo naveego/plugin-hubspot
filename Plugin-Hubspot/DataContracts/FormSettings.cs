@@ -2,13 +2,10 @@ namespace Plugin_Hubspot.DataContracts
 {
     public class FormSettings
     {
-        public string OAuthClientId { get; set; }
-        
-        public string OAuthClientSecret { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        
-        public string ConvertNullToZero { get; set; }
+        /// <summary>
+        /// Used for testing
+        /// </summary>
+        public string APIToken { get; set; }
 
     }
 }

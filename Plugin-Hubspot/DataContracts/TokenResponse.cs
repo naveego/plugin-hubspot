@@ -1,12 +1,16 @@
+using Newtonsoft.Json;
+
 namespace Plugin_Hubspot.DataContracts
 {
     public class TokenResponse
     {
-        public string access_token   { get; set; }
-        public string refresh_token  { get; set; }
-        public int    expires_in_sec { get; set; }
-        public string api_domain     { get; set; }
-        public string token_type     { get; set; }
-        public int    expires_in     { get; set; }
+        [JsonProperty("access_token")]
+        public string AccessToken { get; set; }
+        
+        [JsonProperty("refresh_token")]
+        public string RefreshToken { get; set; }
+        
+        [JsonProperty("instance_url")]
+        public string InstanceUrl { get; set; }
     }
 }

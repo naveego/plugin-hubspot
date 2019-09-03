@@ -17,25 +17,137 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Plugin_Hubspot.DataContracts;
 using Plugin_Hubspot.Helper;
+using Plugin_Hubspot.HubSpotApi;
 using Pub;
 
 namespace Plugin_Hubspot.Plugin
 {
     public class Plugin : Publisher.PublisherBase
     {
-        private readonly string _authUri = "https://login.naveego.com";
-        private readonly string _apiUri = "https://useast-pod-01.naveegoapi.com";
-        private readonly HttpClient _injectedClient;
+        private readonly HubSpotApiClient _hubSpotClient;
         
-        private string _authToken = null;
         private FormSettings _formSettings;
-        private string[] _convertNullToZero;
   
         private TaskCompletionSource<bool> _tcs;
         
-        public Plugin(HttpClient client = null)
+        public Plugin(HttpClient httpClient = null)
         {
-            _injectedClient = client != null ? client : new HttpClient();
+            _hubSpotClient =  new HubSpotApiClient(httpClient ?? new HttpClient());
+        }
+
+        public override Task<BeginOAuthFlowResponse> BeginOAuthFlow(BeginOAuthFlowRequest request, ServerCallContext context)
+        {
+            Logger.Info("Getting Auth URL...");
+            
+            
+            // params for auth url
+            var clientId = request.Configuration.ClientId;
+            var responseType = "code";
+            var redirectUrl = request.RedirectUrl;
+
+
+            // build auth url
+            var authUrl = String.Format(
+                "https://app.hubspot.com/oauth/authorize?client_id={0}&response_type={1}&redirect_uri={2}",
+                clientId,
+                responseType,
+                redirectUrl);
+
+            // return auth url
+            var oAuthResponse = new BeginOAuthFlowResponse
+            {
+                AuthorizationUrl = authUrl
+            };
+
+            Logger.Info($"Created Auth URL: {authUrl}");
+
+            return Task.FromResult(oAuthResponse);
+        }
+
+        public override async Task<CompleteOAuthFlowResponse> CompleteOAuthFlow(CompleteOAuthFlowRequest request, ServerCallContext context)
+        {
+            Logger.Info("Getting Auth and Refresh Token...");
+
+            string code;
+            var uri = new Uri(request.RedirectUrl);
+
+            try
+            {
+                code = HttpUtility.UrlDecode(HttpUtility.ParseQueryString(uri.Query).Get("code"));
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
+            
+            // token url parameters
+            var redirectUrl = String.Format("{0}{1}{2}{3}", uri.Scheme, Uri.SchemeDelimiter, uri.Authority,
+                uri.AbsolutePath);
+            var clientId = request.Configuration.ClientId;
+            var clientSecret = request.Configuration.ClientSecret;
+            var grantType = "authorization_code";
+
+            // build token url
+            var tokenUrl = "https://api.hubapi.com/oauth/v1/token";
+
+            // build form data request
+            var formData = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("grant_type", grantType),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret),
+                new KeyValuePair<string, string>("redirect_uri", redirectUrl),
+                new KeyValuePair<string, string>("code", code)
+            };
+            
+            var body = new FormUrlEncodedContent(formData);
+
+            // get tokens
+            var oAuthState = new OAuthState();
+            try
+            {
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var response = await client.PostAsync(tokenUrl, body);
+                response.EnsureSuccessStatusCode();
+
+                var content = JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync());
+
+                oAuthState.AuthToken = content.AccessToken;
+                oAuthState.RefreshToken = content.RefreshToken;
+                oAuthState.Config = JsonConvert.SerializeObject(new OAuthConfig
+                {
+                    InstanceUrl = content.InstanceUrl
+                });
+
+                if (String.IsNullOrEmpty(oAuthState.RefreshToken))
+                {
+                    throw new Exception("Response did not contain a refresh token");
+                }
+
+                if (String.IsNullOrEmpty(content.InstanceUrl))
+                {
+                    throw new Exception("Response did not contain an instance url");
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
+
+            // return oauth state json
+            var oAuthResponse = new CompleteOAuthFlowResponse
+            {
+                OauthStateJson = JsonConvert.SerializeObject(oAuthState)
+            };
+
+            Logger.Info("Got Auth Token and Refresh Token");
+
+            return oAuthResponse;
+
         }
 
         /// <summary>
@@ -49,10 +161,6 @@ namespace Plugin_Hubspot.Plugin
             try
             {
                 _formSettings = JsonConvert.DeserializeObject<FormSettings>(request.SettingsJson);
-
-                _convertNullToZero = (_formSettings.ConvertNullToZero == null)
-                    ? new string[0]
-                    : _formSettings.ConvertNullToZero.Split(',', StringSplitOptions.RemoveEmptyEntries);
             }
             catch (Exception e)
             {
@@ -81,12 +189,8 @@ namespace Plugin_Hubspot.Plugin
             // attempt to call the Legacy API api
             try
             {
-                var whoAmIUrl = $"{_apiUri}/v3/whoami";
-
-
-                var response = await _injectedClient.GetAsync(whoAmIUrl);
-                response.EnsureSuccessStatusCode();
-                Logger.Info("Connected to Naveego Legacy API");
+                await _hubSpotClient.TestConnection();
+                Logger.Info("Successfully Connected to HubSpot API");
             }
             catch (Exception e)
             {
@@ -140,345 +244,37 @@ namespace Plugin_Hubspot.Plugin
             ServerCallContext context)
         {
             Logger.Info("Discovering Schemas...");
-
+            
             DiscoverSchemasResponse discoverSchemasResponse = new DiscoverSchemasResponse();
 
-            var isAuthed = await AuthorizeHttpClient();
-            if (!isAuthed)
-            {
-                return discoverSchemasResponse;
-            }
+            // Resolve the dynamic Api Schemas and add them to the list
+            var contactSchema = await
+                _hubSpotClient.GetDynamicApiSchema(DynamicObject.Contacts, "Contacts", "HubSpot Contacts");
 
-            // get to get a schema for each module found
-            try
-            {
-                var rulesUrl = $"{_apiUri}/v3/mdm/merging/rules";
-                var rulesResp = await _injectedClient.GetAsync(rulesUrl);
-                rulesResp.EnsureSuccessStatusCode();
+            var companiesSchema = await
+                _hubSpotClient.GetDynamicApiSchema(DynamicObject.Companies, "Companies", "HubSpot Companies");
 
-                dynamic rulesJson = JObject.Parse(await rulesResp.Content.ReadAsStringAsync());
+            var dealsSchema = await
+                _hubSpotClient.GetDynamicApiSchema(DynamicObject.Deals, "Deals", "HubSpot Deals");
 
-                foreach (dynamic rule in rulesJson.data)
-                {
-                    var schema = new Schema
-                    {
-                        Id = rule.@object,
-                        Name = rule.@object,
-                        DataFlowDirection = Schema.Types.DataFlowDirection.Read
-                    };
-                    
-                    // Add ID property
-                    schema.Properties.Add(new Property
-                    {
-                        Id = "ID",
-                        Name = "ID",
-                        Type = PropertyType.String,
-                        Description = "The global identifier",
-                        IsKey = true
-                    });
+            discoverSchemasResponse.Schemas.Add(contactSchema.ToSchema());
+            discoverSchemasResponse.Schemas.Add(companiesSchema.ToSchema());
+            discoverSchemasResponse.Schemas.Add(dealsSchema.ToSchema());
 
-                    foreach (dynamic prop in rule.properties)
-                    {
-                        schema.Properties.Add(new Property
-                        {
-                            Id = prop.name,
-                            Name = prop.name,
-                            Type = GetPropertyType((string)prop.type)
-                        });
-                    }
-
-                    discoverSchemasResponse.Schemas.Add(schema);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e.Message);
-                throw;
-            }
-
-            Logger.Info($"Schemas found: {discoverSchemasResponse.Schemas.Count}");
-
-            // only return requested schemas if refresh mode selected
-            if (request.Mode == DiscoverSchemasRequest.Types.Mode.Refresh)
-            {
-                var refreshSchemaIds = request.ToRefresh.Select(x => x.Id);
-                var schemas =
-                    JsonConvert.DeserializeObject<Schema[]>(
-                        JsonConvert.SerializeObject(discoverSchemasResponse.Schemas));
-                discoverSchemasResponse.Schemas.Clear();
-                discoverSchemasResponse.Schemas.AddRange(schemas.Where(x => refreshSchemaIds.Contains(x.Id)));
-                
-
-                Logger.Debug($"Schemas found: {JsonConvert.SerializeObject(schemas)}");
-                Logger.Debug($"Refresh requested on schemas: {refreshSchemaIds}");
-
-                Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
-                return discoverSchemasResponse;
-            }
-
-            // return all schemas otherwise
-            Logger.Info($"Schemas returned: {discoverSchemasResponse.Schemas.Count}");
             return discoverSchemasResponse;
-        }
-
-        /// <summary>
-        /// Publishes a stream of data for a given schema
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="responseStream"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public override async Task ReadStream(ReadRequest request, IServerStreamWriter<Record> responseStream,
-            ServerCallContext context)
-        {
-            var schema = request.Schema;
-            var limit = request.Limit;
-            var limitFlag = request.Limit != 0;
-            
-            // get to get a schema for each module found
-            try
-            {
-                
-                // get additional metadata about properties for formatting
-                var metaUrl = $"{_apiUri}/v3/metadata/objects/{schema.Name}";
-                var metaResp = await _injectedClient.GetAsync(metaUrl);
-                LegacyMetadata metaJson = JsonConvert.DeserializeObject<LegacyMetadata>(await metaResp.Content.ReadAsStringAsync());
-                
-                var recordCount = 0;
-                var page = 1;
-                var pageSize = 100;
-
-                do
-                {
-                    var dataUrl = $"{_apiUri}/v3/data/objects/{schema.Name}?page={page}&pagesize={pageSize}";
-                    var dataResp = await _injectedClient.GetAsync(dataUrl);
-                    dataResp.EnsureSuccessStatusCode();
-
-                    dynamic dataJson = JObject.Parse(await dataResp.Content.ReadAsStringAsync());
-                    int total = dataJson.meta.count;
-                    JArray items = (JArray) dataJson.data;
-                    
-                    foreach (dynamic item in items)
-                    {
-                        var data = new Dictionary<string, object>();
-                        
-                        foreach (var prop in schema.Properties)
-                        {
-
-                            var propMeta = metaJson.LegacyProperties.FirstOrDefault(p => p.Name == prop.Id);
-                            var scale = (propMeta != null) ? propMeta.Scale : 0;
-                            
-                            if (prop.Id == "ID")
-                            {
-                                data.Add(prop.Id, item._id.ToString());
-                                continue;
-                            }
-
-                            if (item.ContainsKey(prop.Id))
-                            {
-                                object value = item[prop.Id];
-                                if (value != null)
-                                {
-                                    switch (prop.Type)
-                                    {
-                                        case PropertyType.String:
-                                            // This is a number as s string as it has preceding zeros
-                                            if (value.ToString().StartsWith("0") && value.ToString().Length > 1)
-                                            {
-                                                value = value.ToString().Replace("\n", "\r\n");
-                                            }
-                                            else if (DateTime.TryParseExact(value.ToString(), "MM/dd/yyyy hh:mm:ss",
-                                                new CultureInfo("en-US"), DateTimeStyles.None, out var dr))
-                                            {
-                                                value = dr.ToString("yyyy-MM-ddTHH:mm:ss");
-                                            }
-                                            else if (decimal.TryParse(value.ToString(), out var d))
-                                            {
-                                                var suffix = (value.ToString().Contains("\n")) ? "\r\n" : "";
-                                                value = (!ConvertNullToZero(prop.Id) && d == 0.0M) ? null : PrepareDecimal(scale, d);
-
-                                                if (suffix != "")
-                                                {
-                                                    value = value.ToString() + suffix;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                value = (value.ToString()).Replace("\n", "\r\n");
-                                            }
-                                            break;
-                                        case PropertyType.Datetime:
-                                            if (value is DateTime time)
-                                            {
-                                                value = time.ToString("yyyy-MM-ddTHH:mm:ss");
-                                            }
-                                            else if (DateTime.TryParse(value.ToString(), out var rd))
-                                            {
-                                                value = rd.ToString("yyyy-MM-ddTHH:mm:ss");
-                                            }
-                                            break;
-                                        case PropertyType.Float:
-                                        case PropertyType.Decimal:
-                                            value = (Convert.ToDecimal(value) == 0.0M) ? null : PrepareDecimal(scale, Convert.ToDecimal(value));
-                                            break;
-                                        case PropertyType.Integer:
-                                            value = (Convert.ToInt64(value) == 0) ? null : value;
-                                            break;
-                                    }
-
-                                    data.Add(prop.Id, value);
-                                    continue;
-                                }
-                            }
-
-                            data.Add(prop.Id, null);
-                        }
-
-                        var record = new Record
-                        {
-                            Action = Record.Types.Action.Upsert,
-                            DataJson = JsonConvert.SerializeObject(data)
-                        };
-
-                        if (limitFlag && recordCount == limit)
-                        {
-                            break;
-                        }
-
-                        await responseStream.WriteAsync(record);
-                        recordCount++;
-                    }
-                    
-                    if (limitFlag && recordCount == limit)
-                    {
-                        break;
-                    }
-
-                    if (recordCount == total || items.Count == 0)
-                    {
-                        break;
-                    }
-
-                    page++;
-                } while (true);
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e.Message);
-                throw;
-            }
-        }
-
-        
-        /// <summary>
-        /// Gets the Naveego type from the provided Zoho information
-        /// </summary>
-        /// <param name="field"></param>
-        /// <returns>The property type</returns>
-        private PropertyType GetPropertyType(string type)
-        {
-            switch (type)
-            {
-                case "boolean":
-                    return PropertyType.Bool;
-                case "double":
-                    return PropertyType.Float;
-                case "number":
-                case "integer":
-                    return PropertyType.Integer;
-                case "jsonarray":
-                case "jsonobject":
-                    return PropertyType.Json;
-                case "date":
-                case "datetime":
-                    return PropertyType.Datetime;
-                case "time":
-                    return PropertyType.Text;
-                case "float":
-                    return PropertyType.Float;
-                case "decimal":
-                    return PropertyType.Decimal;
-                default:
-                    return PropertyType.String;
-            }
-        }
-
-        private string PrepareDecimal(int scale, decimal value)
-        {
-         
-            
-            var s = value.ToString();
-            var numOfZeros = scale;
-            
-            if (scale == 0)
-            {
-                return s;
-            }
-            
-            var idx = s.IndexOf('.');
-            if (idx <= 0)
-            {
-                s += ".";
-            }
-            else
-            {
-                numOfZeros = scale - (s.Length - (idx + 1));
-            }
-
-            return s + new string('0', numOfZeros);
-        }
-        
-        /// <summary>
-        /// Checks if a http response message is not empty and did not fail
-        /// </summary>
-        /// <param name="response"></param>
-        /// <returns></returns>
-        private bool IsSuccessAndNotEmpty(HttpResponseMessage response)
-        {
-            return response.StatusCode != HttpStatusCode.NoContent && response.IsSuccessStatusCode;
-        }
-
-        private bool ConvertNullToZero(string fieldName)
-        {
-            return _convertNullToZero.Contains(fieldName, StringComparer.OrdinalIgnoreCase);
         }
 
         private async Task<bool> AuthorizeHttpClient()
         {
-            if (_authToken != null)
+            if (_formSettings.APIToken != null)
             {
-                _injectedClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", _authToken);
-
                 return true;
             }
             
             try
             {
-                var keyValues = new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("grant_type", "password"),
-                    new KeyValuePair<string, string>("username", _formSettings.Username),
-                    new KeyValuePair<string, string>("password", _formSettings.Password),
-                    new KeyValuePair<string, string>("client_id", _formSettings.OAuthClientId),
-                    new KeyValuePair<string, string>("client_secret", _formSettings.OAuthClientSecret)
-                };
-                var formContent = new FormUrlEncodedContent(keyValues);
-
-                var authUrl = $"{_authUri}/oauth2/token";
-
-                var resp = await _injectedClient.PostAsync(authUrl, formContent);
-
-                if (resp.IsSuccessStatusCode)
-                {
-                    var respJson = JObject.Parse(await resp.Content.ReadAsStringAsync());
-                    _authToken = (string) respJson["access_token"];
-
-                    _injectedClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", _authToken);
-                    
-                    return true;
-                }
+                _hubSpotClient.UseApiToken(_formSettings.APIToken);
+                await Task.Delay(0);
             }
             catch (Exception e)
             {
