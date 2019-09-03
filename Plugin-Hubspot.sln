@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin-Hubspot", "Plugin-Hu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin-Hubspot.Test", "Plugin-Hubspot.Test\Plugin-Hubspot.Test.csproj", "{D985095D-FD45-4514-84E0-640167AEBD7D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin-Hubspot.Integration.Tests", "Plugin-Hubspot.Integration.Tests\Plugin-Hubspot.Integration.Tests.csproj", "{9B1496AB-646A-4133-B615-39F2D5C675F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{D985095D-FD45-4514-84E0-640167AEBD7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D985095D-FD45-4514-84E0-640167AEBD7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D985095D-FD45-4514-84E0-640167AEBD7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B1496AB-646A-4133-B615-39F2D5C675F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B1496AB-646A-4133-B615-39F2D5C675F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B1496AB-646A-4133-B615-39F2D5C675F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B1496AB-646A-4133-B615-39F2D5C675F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

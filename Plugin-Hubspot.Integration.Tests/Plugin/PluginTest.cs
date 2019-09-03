@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Castle.Core.Internal;
 using Grpc.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -13,17 +12,18 @@ using Record = Pub.Record;
 
 namespace Plugin_Hubspot.Plugin
 {
-    public class PluginIntegrationTests
+    public class PluginTests
     {
         private ConnectRequest GetConnectSettings()
         {
+            
             return new ConnectRequest
             {
                 SettingsJson = "{\"OAuthClientID\":\"123\",\"OAuthClientSecret\":\"456\",\"Username\":\"test\",\"Password\": \"test\"}"
             };
         }
         
-        [Fact, Trait("Type", "Integration")]
+        [Fact]
         public async Task ConnectTest()
         {
             // setup
@@ -49,16 +49,16 @@ namespace Plugin_Hubspot.Plugin
 
             // assert
             Assert.IsType<ConnectResponse>(response);
-            Assert.True(response.OauthError.IsNullOrEmpty(), "OAuthError not null or empty");
-            Assert.True(response.ConnectionError.IsNullOrEmpty(), $"ConnectionError not null or empty:{response.ConnectionError}");
-            Assert.True(response.SettingsError.IsNullOrEmpty(), $"SettingsError not null or empty:{response.SettingsError}");
+            Assert.True(string.IsNullOrEmpty(response.OauthError), "OAuthError not null or empty");
+            Assert.True(string.IsNullOrEmpty(response.ConnectionError), $"ConnectionError not null or empty:{response.ConnectionError}");
+            Assert.True(string.IsNullOrEmpty(response.SettingsError), $"SettingsError not null or empty:{response.SettingsError}");
 
             // cleanup
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
 
-        [Fact, Trait("Type", "Integration")]
+        [Fact]
         public async Task DiscoverSchemasAllTest()
         {
             // setup
@@ -116,7 +116,7 @@ namespace Plugin_Hubspot.Plugin
             await server.ShutdownAsync();
         }
 
-        [Fact, Trait("Type", "Integration")]
+        [Fact]
         public async Task DiscoverSchemasRefreshTest()
         {
             // setup
@@ -155,7 +155,7 @@ namespace Plugin_Hubspot.Plugin
             await server.ShutdownAsync();
         }
 
-        [Fact, Trait("Type", "Integration")]
+        [Fact]
         public async Task ReadStreamTest()
         {
             // setup
@@ -197,7 +197,7 @@ namespace Plugin_Hubspot.Plugin
             await server.ShutdownAsync();
         }
         
-        [Fact, Trait("Type", "Integration")]
+        [Fact]
         public async Task ReadStreamTestChangeNewLinetoCarriageReturnLineFeed()
         {
             // setup        
@@ -244,7 +244,7 @@ namespace Plugin_Hubspot.Plugin
         }
         
         
-        [Fact, Trait("Type", "Integration")]
+        [Fact]
         public async Task ReadStreamTestSetDecimalPrecision()
         {
             // setup        
