@@ -23,7 +23,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Plugin" />
+      <None Update="TestData\contact.properties.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\companies.properties.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\deals.properties.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

@@ -6,12 +6,12 @@ using Pub;
 
 namespace Plugin_Hubspot.HubSpotApi
 {
-    public class DynamicApiSchemaSchemaGenerationTests
+    public class DynamicApiSchema_SchemaGenerationTests
     {
         private Schema SchemaToTest { get; set; }
 
      
-        public DynamicApiSchemaSchemaGenerationTests()
+        public DynamicApiSchema_SchemaGenerationTests()
         {
             
             var d = new DynamicApiSchema(

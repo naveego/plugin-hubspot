@@ -24,15 +24,17 @@ namespace Plugin_Hubspot.Plugin
 {
     public class Plugin : Publisher.PublisherBase
     {
+        private readonly HttpClient _httpClient;
         private readonly HubSpotApiClient _hubSpotClient;
-        
+     
         private FormSettings _formSettings;
   
         private TaskCompletionSource<bool> _tcs;
         
         public Plugin(HttpClient httpClient = null)
         {
-            _hubSpotClient =  new HubSpotApiClient(httpClient ?? new HttpClient());
+            _httpClient = httpClient ?? new HttpClient();
+            _hubSpotClient =  new HubSpotApiClient(_httpClient);
         }
 
         public override Task<BeginOAuthFlowResponse> BeginOAuthFlow(BeginOAuthFlowRequest request, ServerCallContext context)
@@ -107,29 +109,17 @@ namespace Plugin_Hubspot.Plugin
             var oAuthState = new OAuthState();
             try
             {
-                var client = new HttpClient();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var response = await client.PostAsync(tokenUrl, body);
+                var response = await _httpClient.PostAsync(tokenUrl, body);
                 response.EnsureSuccessStatusCode();
 
                 var content = JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync());
 
                 oAuthState.AuthToken = content.AccessToken;
                 oAuthState.RefreshToken = content.RefreshToken;
-                oAuthState.Config = JsonConvert.SerializeObject(new OAuthConfig
-                {
-                    InstanceUrl = content.InstanceUrl
-                });
 
                 if (String.IsNullOrEmpty(oAuthState.RefreshToken))
                 {
                     throw new Exception("Response did not contain a refresh token");
-                }
-
-                if (String.IsNullOrEmpty(content.InstanceUrl))
-                {
-                    throw new Exception("Response did not contain an instance url");
                 }
             }
             catch (Exception e)
@@ -160,7 +150,7 @@ namespace Plugin_Hubspot.Plugin
         {
             try
             {
-                _formSettings = JsonConvert.DeserializeObject<FormSettings>(request.SettingsJson);
+                _formSettings = JsonConvert.DeserializeObject<FormSettings>(request.SettingsJson) ?? new FormSettings();
             }
             catch (Exception e)
             {
@@ -233,6 +223,25 @@ namespace Plugin_Hubspot.Plugin
             await _tcs.Task;
         }
 
+        /// <summary>
+        /// Handles disconnect requests from the agent
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override Task<DisconnectResponse> Disconnect(DisconnectRequest request, ServerCallContext context)
+        {
+            // alert connection session to close
+            if (_tcs != null)
+            {
+                _tcs.SetResult(true);
+                _tcs = null;
+            }
+
+            Logger.Info("Disconnected");
+            return Task.FromResult(new DisconnectResponse());
+        }
+
 
         /// <summary>
         /// Discovers schemas located in the users Zoho CRM instance
@@ -247,19 +256,34 @@ namespace Plugin_Hubspot.Plugin
             
             DiscoverSchemasResponse discoverSchemasResponse = new DiscoverSchemasResponse();
 
+            var schemasToLoad = (request.ToRefresh.Count > 0)
+                ? request.ToRefresh.Select(s => s.Id).ToArray()
+                : new[] {"contacts", "companies", "deals"};
+
             // Resolve the dynamic Api Schemas and add them to the list
-            var contactSchema = await
-                _hubSpotClient.GetDynamicApiSchema(DynamicObject.Contacts, "Contacts", "HubSpot Contacts");
+            if (schemasToLoad.Contains("contacts"))
+            {
+                var contactSchema = await
+                    _hubSpotClient.GetDynamicApiSchema(DynamicObject.Contacts, "Contacts", "HubSpot Contacts");
 
-            var companiesSchema = await
-                _hubSpotClient.GetDynamicApiSchema(DynamicObject.Companies, "Companies", "HubSpot Companies");
+                discoverSchemasResponse.Schemas.Add(contactSchema.ToSchema());
+            }
 
-            var dealsSchema = await
-                _hubSpotClient.GetDynamicApiSchema(DynamicObject.Deals, "Deals", "HubSpot Deals");
+            if (schemasToLoad.Contains("companies"))
+            {
+                var companiesSchema = await
+                    _hubSpotClient.GetDynamicApiSchema(DynamicObject.Companies, "Companies", "HubSpot Companies");
 
-            discoverSchemasResponse.Schemas.Add(contactSchema.ToSchema());
-            discoverSchemasResponse.Schemas.Add(companiesSchema.ToSchema());
-            discoverSchemasResponse.Schemas.Add(dealsSchema.ToSchema());
+                discoverSchemasResponse.Schemas.Add(companiesSchema.ToSchema());
+            }
+
+            if (schemasToLoad.Contains("deals"))
+            {
+                var dealsSchema = await
+                    _hubSpotClient.GetDynamicApiSchema(DynamicObject.Deals, "Deals", "HubSpot Deals");
+                
+                discoverSchemasResponse.Schemas.Add(dealsSchema.ToSchema());
+            }
 
             return discoverSchemasResponse;
         }

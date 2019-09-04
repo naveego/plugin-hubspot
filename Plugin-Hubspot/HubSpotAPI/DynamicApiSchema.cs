@@ -15,14 +15,13 @@ namespace Plugin_Hubspot.HubSpotApi
     
     public class DynamicApiSchema : APISchema
     {
-
-        private readonly List<APIProperty> _properties;
-        
         public DynamicObject Object  { get; private set; }
         
         public string Name { get; private set; }
         
         public string Description { get; private set; }
+
+        public List<APIProperty> Properties { get; }
 
 
         /// <summary>
@@ -38,12 +37,12 @@ namespace Plugin_Hubspot.HubSpotApi
             this.Object = obj;
             this.Name = name;
             this.Description = description;
-            this._properties = properties ?? new List<APIProperty>();
+            this.Properties = properties ?? new List<APIProperty>();
         }
 
         public void AddProperty(APIProperty property)
         {
-            _properties.Add(property);
+            Properties.Add(property);
         }
         
         public override Schema ToSchema()
@@ -56,7 +55,7 @@ namespace Plugin_Hubspot.HubSpotApi
                 DataFlowDirection = Schema.Types.DataFlowDirection.Read
             };
 
-            foreach (var apiProp in this._properties)
+            foreach (var apiProp in this.Properties)
             {
                 var prop = new Property
                 {

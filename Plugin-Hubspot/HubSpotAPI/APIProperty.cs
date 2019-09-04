@@ -14,7 +14,7 @@ namespace Plugin_Hubspot.HubSpotApi
         
         public string FieldType { get; set; }
         
-        public bool Deleted { get; set; }
+        public bool? Deleted { get; set; }
         
         public int DisplayOrder { get; set; }
         
