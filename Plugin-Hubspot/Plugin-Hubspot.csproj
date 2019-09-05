@@ -5,7 +5,7 @@
         <TargetFramework>netcoreapp2.2</TargetFramework>
         <RootNamespace>Plugin_Hubspot</RootNamespace>
         <RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
-        <AssemblyName>plugin-hubspot</AssemblyName>
+        <AssemblyName>Plugin-Hubspot</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
