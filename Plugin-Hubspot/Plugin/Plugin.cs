@@ -50,7 +50,7 @@ namespace Plugin_Hubspot.Plugin
 
             // build auth url
             var authUrl = String.Format(
-                "https://app.hubspot.com/oauth/authorize?client_id={0}&response_type={1}&redirect_uri={2}",
+                "https://app.hubspot.com/oauth/authorize?client_id={0}&response_type={1}&redirect_uri={2}&scope=contacts%20forms",
                 clientId,
                 responseType,
                 redirectUrl);

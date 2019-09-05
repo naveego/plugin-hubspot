@@ -44,11 +44,9 @@ namespace Plugin_Hubspot.Plugin
             var clientId = request.Configuration.ClientId;
             var responseType = "code";
             var redirectUrl = request.RedirectUrl;
-            var prompt = "consent";
-            var display = "popup";
 
             var authUrl = String.Format(
-                "https://app.hubspot.com/oauth/authorize?client_id={0}&response_type={1}&redirect_uri={2}",
+                "https://app.hubspot.com/oauth/authorize?client_id={0}&response_type={1}&redirect_uri={2}&scope=contacts%20forms",
                 clientId,
                 responseType,
                 redirectUrl);
