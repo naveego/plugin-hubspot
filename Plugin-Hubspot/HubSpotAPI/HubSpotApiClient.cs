@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
@@ -77,7 +78,7 @@ namespace Plugin_Hubspot.HubSpotApi
             }
 
             var token = await _authenticator.GetToken();
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             
             return await _httpClient.GetAsync(uri);
         }
