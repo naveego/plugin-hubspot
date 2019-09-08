@@ -270,39 +270,47 @@ namespace Plugin_Hubspot.Plugin
             ServerCallContext context)
         {
             Logger.Info("Discovering Schemas...");
-            
+
             DiscoverSchemasResponse discoverSchemasResponse = new DiscoverSchemasResponse();
 
             var schemasToLoad = (request.ToRefresh.Count > 0)
                 ? request.ToRefresh.Select(s => s.Id).ToArray()
                 : new[] {"contacts", "companies", "deals"};
 
-            // Resolve the dynamic Api Schemas and add them to the list
-            if (schemasToLoad.Contains("contacts"))
+            try
             {
-                var contactSchema = await
-                    _hubSpotClient.GetDynamicApiSchema(DynamicObject.Contacts, "Contacts", "HubSpot Contacts");
+                // Resolve the dynamic Api Schemas and add them to the list
+                if (schemasToLoad.Contains("contacts"))
+                {
+                    var contactSchema = await
+                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Contacts, "Contacts", "HubSpot Contacts");
 
-                discoverSchemasResponse.Schemas.Add(contactSchema.ToSchema());
-            }
+                    discoverSchemasResponse.Schemas.Add(contactSchema.ToSchema());
+                }
 
-            if (schemasToLoad.Contains("companies"))
-            {
-                var companiesSchema = await
-                    _hubSpotClient.GetDynamicApiSchema(DynamicObject.Companies, "Companies", "HubSpot Companies");
+                if (schemasToLoad.Contains("companies"))
+                {
+                    var companiesSchema = await
+                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Companies, "Companies", "HubSpot Companies");
 
-                discoverSchemasResponse.Schemas.Add(companiesSchema.ToSchema());
-            }
+                    discoverSchemasResponse.Schemas.Add(companiesSchema.ToSchema());
+                }
 
-            if (schemasToLoad.Contains("deals"))
-            {
-                var dealsSchema = await
-                    _hubSpotClient.GetDynamicApiSchema(DynamicObject.Deals, "Deals", "HubSpot Deals");
+                if (schemasToLoad.Contains("deals"))
+                {
+                    var dealsSchema = await
+                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Deals, "Deals", "HubSpot Deals");
+
+                    discoverSchemasResponse.Schemas.Add(dealsSchema.ToSchema());
+                }
                 
-                discoverSchemasResponse.Schemas.Add(dealsSchema.ToSchema());
+                return discoverSchemasResponse;
             }
-
-            return discoverSchemasResponse;
+            catch (Exception ex)
+            {
+                Logger.Error("Could not discover schemas: " + ex.ToString());
+                throw;
+            }  
         }
     }
 }
