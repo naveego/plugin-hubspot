@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Runtime.CompilerServices;
 using FluentAssertions;
 using RichardSzalay.MockHttp;
 using Xunit;
@@ -16,6 +17,8 @@ namespace Plugin_Hubspot.HubSpotApi
             var mockHttp = new MockHttpMessageHandler();
             sut = new HubSpotApiClient(mockHttp.ToHttpClient());
             
+            sut.UseApiToken("123");
+            
             mockHttp.When("https://api.hubapi.com/properties/v1/contacts/properties")
                 .RespondWithJsonFile("TestData/contact.properties.json");
         }
@@ -24,17 +27,17 @@ namespace Plugin_Hubspot.HubSpotApi
         public async void ShouldReadAllPropertiesFromResponse()
         {
             // Act
-            var ds = await sut.GetDynamicApiSchema(DynamicObject.Contacts, "", "");
+            var ds = await sut.GetDynamicApiSchema(DynamicObject.Contacts, "", "", "Vid");
             
             // Assert
-            ds.Properties.Should().HaveCount(167);
+            ds.Properties.Should().HaveCount(168, "All of the defined properties plus the Vid");
         }
 
         [Fact]
         public async void ShouldDeserializeCorePropertyAttributesCorrectly()
         {
             // Act
-            var ds = await sut.GetDynamicApiSchema(DynamicObject.Contacts, "", "");
+            var ds = await sut.GetDynamicApiSchema(DynamicObject.Contacts, "", "", "");
             
             // Assert
             var companySize = ds.Properties.First(p => p.Name == "company_size");

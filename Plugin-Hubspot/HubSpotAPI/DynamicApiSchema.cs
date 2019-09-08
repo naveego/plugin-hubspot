@@ -17,6 +17,8 @@ namespace Plugin_Hubspot.HubSpotApi
     {
         public DynamicObject Object  { get; private set; }
         
+        public string IdProp { get; private set; }
+        
         public string Name { get; private set; }
         
         public string Description { get; private set; }
@@ -32,11 +34,12 @@ namespace Plugin_Hubspot.HubSpotApi
         /// <param name="name"></param>
         /// <param name="description"></param>
         /// <param name="properties">Optional list of properties</param>
-        public DynamicApiSchema(DynamicObject obj, string name, string description, List<APIProperty> properties = null)
+        public DynamicApiSchema(DynamicObject obj, string name, string description, string idProp, List<APIProperty> properties = null)
         {
             this.Object = obj;
             this.Name = name;
             this.Description = description;
+            this.IdProp = idProp;
             this.Properties = properties ?? new List<APIProperty>();
         }
 
@@ -54,6 +57,16 @@ namespace Plugin_Hubspot.HubSpotApi
                 Description = this.Description,
                 DataFlowDirection = Schema.Types.DataFlowDirection.Read
             };
+            
+            // Add the id property
+            s.Properties.Add(new Property
+            {
+                Id = IdProp,
+                Name = IdProp,
+                Description = "",
+                IsKey = true,
+                Type = PropertyType.String
+            });
 
             foreach (var apiProp in this.Properties)
             {

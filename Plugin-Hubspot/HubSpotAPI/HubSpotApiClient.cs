@@ -31,7 +31,7 @@ namespace Plugin_Hubspot.HubSpotApi
             return true;
         }
 
-        public async Task<DynamicApiSchema> GetDynamicApiSchema(DynamicObject obj, string name, string description)
+        public async Task<DynamicApiSchema> GetDynamicApiSchema(DynamicObject obj, string name, string description, string idProp)
         {
             List<APIProperty> properties;
             var objName = Enum.GetName(typeof(DynamicObject), obj).ToLower();
@@ -47,7 +47,7 @@ namespace Plugin_Hubspot.HubSpotApi
                 properties = serializer.Deserialize<List<APIProperty>>(jr);
             }
     
-            return new DynamicApiSchema(obj, name, description, properties);
+            return new DynamicApiSchema(obj, name, description, idProp, properties);
         }
 
         public void UseApiToken(string apiToken)

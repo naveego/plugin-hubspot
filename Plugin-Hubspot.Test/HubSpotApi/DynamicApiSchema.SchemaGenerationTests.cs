@@ -17,7 +17,8 @@ namespace Plugin_Hubspot.HubSpotApi
             var d = new DynamicApiSchema(
                 DynamicObject.Contacts,
                 "Contacts",
-                "A list of contacts for my company");
+                "A list of contacts for my company",
+                "vid");
 
     
             d.AddProperty(new APIProperty
@@ -64,7 +65,15 @@ namespace Plugin_Hubspot.HubSpotApi
         [Fact]
         public void ShouldResultsInTheCorrectNumberOfProperties()
         {
-            SchemaToTest.Properties.Should().HaveCount(3, "Because we added three properties");
+            SchemaToTest.Properties.Should().HaveCount(4, "Because we added three properties plus the id");
+        }
+
+        [Fact]
+        public void ShouldAddKeyPropertyWithNameOfIdProp()
+        {
+            var key = SchemaToTest.Properties.First(p => p.Name == "vid");
+            key.Id.Should().Be("vid");
+            key.IsKey.Should().BeTrue();
         }
 
         // See: https://developers.hubspot.com/docs/methods/crm-properties/create-property
@@ -76,16 +85,16 @@ namespace Plugin_Hubspot.HubSpotApi
         [InlineData("enumeration", PropertyType.String)]
         public void ShouldConvertPropertyTypes(string apiType, PropertyType expectedType)
         {
-            var d = new DynamicApiSchema(DynamicObject.Contacts, "", "");
+            var d = new DynamicApiSchema(DynamicObject.Contacts, "", "", "");
             
             d.AddProperty(new APIProperty
-            {
-                Name = "",
+            { 
+                Name = "TEST",
                 Description = "",
                 Type = apiType
             });
 
-            d.ToSchema().Properties.First().Type.Should().Be(expectedType);
+            d.ToSchema().Properties.First(p => p.Name == "TEST").Type.Should().Be(expectedType);
         }
 
         

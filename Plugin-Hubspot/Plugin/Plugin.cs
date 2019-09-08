@@ -283,7 +283,7 @@ namespace Plugin_Hubspot.Plugin
                 if (schemasToLoad.Contains("contacts"))
                 {
                     var contactSchema = await
-                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Contacts, "Contacts", "HubSpot Contacts");
+                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Contacts, "Contacts", "HubSpot Contacts", "vid");
 
                     discoverSchemasResponse.Schemas.Add(contactSchema.ToSchema());
                 }
@@ -291,7 +291,7 @@ namespace Plugin_Hubspot.Plugin
                 if (schemasToLoad.Contains("companies"))
                 {
                     var companiesSchema = await
-                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Companies, "Companies", "HubSpot Companies");
+                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Companies, "Companies", "HubSpot Companies", "companyId");
 
                     discoverSchemasResponse.Schemas.Add(companiesSchema.ToSchema());
                 }
@@ -299,7 +299,7 @@ namespace Plugin_Hubspot.Plugin
                 if (schemasToLoad.Contains("deals"))
                 {
                     var dealsSchema = await
-                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Deals, "Deals", "HubSpot Deals");
+                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Deals, "Deals", "HubSpot Deals", "dealId");
 
                     discoverSchemasResponse.Schemas.Add(dealsSchema.ToSchema());
                 }
