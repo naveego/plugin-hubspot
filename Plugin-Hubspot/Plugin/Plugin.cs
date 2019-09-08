@@ -164,16 +164,33 @@ namespace Plugin_Hubspot.Plugin
             }
 
             // create new authenticated request helper with validated settings
-            var authSuccess = await AuthorizeHttpClient();
-
-            if (!authSuccess)
+           
+            if (string.IsNullOrEmpty(_formSettings.APIToken) == false)
             {
-                return new ConnectResponse
+                _hubSpotClient.UseApiToken(_formSettings.APIToken);
+            }
+            else
+            {
+                try
                 {
-                    ConnectionError = "Could not authenticate to API",
-                    OauthError = "",
-                    SettingsError = ""
-                };
+                    var oAuthState = JsonConvert.DeserializeObject<OAuthState>(request.OauthStateJson);
+                    _hubSpotClient.UseOAuth(
+                        request.OauthConfiguration.ClientId,
+                        request.OauthConfiguration.ClientSecret,
+                        oAuthState.RefreshToken
+                    );
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e.Message);
+                    return new ConnectResponse
+                    {
+                        OauthStateJson = request.OauthStateJson,
+                        ConnectionError = "",
+                        OauthError = e.Message,
+                        SettingsError = ""
+                    };
+                }
             }
 
             // attempt to call the Legacy API api
@@ -286,26 +303,6 @@ namespace Plugin_Hubspot.Plugin
             }
 
             return discoverSchemasResponse;
-        }
-
-        private async Task<bool> AuthorizeHttpClient()
-        {
-            if (_formSettings.APIToken != null)
-            {
-                return true;
-            }
-            
-            try
-            {
-                _hubSpotClient.UseApiToken(_formSettings.APIToken);
-                await Task.Delay(0);
-            }
-            catch (Exception e)
-            {
-               Logger.Error($"Could not authenticate plugin: ${e.Message}");
-            }
-
-            return false;
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
@@ -16,6 +17,7 @@ namespace Plugin_Hubspot.HubSpotApi
         private const string ApiUrl = "https://api.hubapi.com";
         private readonly HttpClient _httpClient;
         private string _apiToken = null;
+        private Authenticator _authenticator;
 
         public HubSpotApiClient(HttpClient httpClient = null)
         {
@@ -34,7 +36,7 @@ namespace Plugin_Hubspot.HubSpotApi
             var objName = Enum.GetName(typeof(DynamicObject), obj).ToLower();
             var propertyUrl = $"{ApiUrl}/properties/v1/{objName}/properties";
             
-            var resp = await _httpClient.GetAsync(propertyUrl);
+            var resp = await GetAsync(propertyUrl);
             var stream = await resp.Content.ReadAsStreamAsync();
 
             var serializer = GetSerializer();
@@ -52,14 +54,32 @@ namespace Plugin_Hubspot.HubSpotApi
             _apiToken = apiToken;
         }
 
-        private async Task<HttpResponseMessage> GET(string uri)
+        public void UseOAuth(string clientId, string clientSecret, string refreshToken)
         {
-            var builder = new UriBuilder(uri);
-            var query = HttpUtility.ParseQueryString(builder.Query);
-            query["hapikey"] = _apiToken;
-            builder.Query = query.ToString();
+            _authenticator = new Authenticator(_httpClient, clientId, clientSecret, refreshToken);
+        }
 
-            return await _httpClient.GetAsync(builder.ToString());
+        private async Task<HttpResponseMessage> GetAsync(string uri)
+        {
+            
+            if (string.IsNullOrEmpty(_apiToken) == false) {
+                var builder = new UriBuilder(uri);
+                var query = HttpUtility.ParseQueryString(builder.Query);
+                query["hapikey"] = _apiToken;
+                builder.Query = query.ToString();
+
+                return await _httpClient.GetAsync(builder.ToString());
+            }
+
+            if (_authenticator == null)
+            {
+                throw new Exception("Expected OAuth Configuration");
+            }
+
+            var token = await _authenticator.GetToken();
+            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            
+            return await _httpClient.GetAsync(uri);
         }
 
 

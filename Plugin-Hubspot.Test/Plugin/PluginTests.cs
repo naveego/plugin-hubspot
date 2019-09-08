@@ -257,7 +257,7 @@ namespace Plugin_Hubspot.Plugin
         {
             return new ConnectRequest
             {
-                SettingsJson = "",
+                SettingsJson = "{\"APIToken\": \"123\"}",
                 OauthConfiguration = new OAuthConfiguration
                 {
                     ClientId = "client",
