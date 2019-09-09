@@ -13,12 +13,8 @@ namespace Plugin_Hubspot.HubSpotApi
      
         public DynamicApiSchema_SchemaGenerationTests()
         {
-            
-            var d = new DynamicApiSchema(
-                DynamicObject.Contacts,
-                "Contacts",
-                "A list of contacts for my company",
-                "vid");
+
+            var d = new DynamicApiSchema(DynamicObject.Contacts);
 
     
             d.AddProperty(new APIProperty
@@ -59,7 +55,7 @@ namespace Plugin_Hubspot.HubSpotApi
         {
             SchemaToTest.Id.Should().Be("contacts");
             SchemaToTest.Name.Should().Be("Contacts");
-            SchemaToTest.Description.Should().Be("A list of contacts for my company");
+            SchemaToTest.Description.Should().Be("Contacts from HubSpot API");
         }
 
         [Fact]
@@ -85,7 +81,7 @@ namespace Plugin_Hubspot.HubSpotApi
         [InlineData("enumeration", PropertyType.String)]
         public void ShouldConvertPropertyTypes(string apiType, PropertyType expectedType)
         {
-            var d = new DynamicApiSchema(DynamicObject.Contacts, "", "", "");
+            var d = new DynamicApiSchema(DynamicObject.Contacts);
             
             d.AddProperty(new APIProperty
             { 

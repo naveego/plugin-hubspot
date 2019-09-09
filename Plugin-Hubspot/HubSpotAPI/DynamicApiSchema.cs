@@ -6,22 +6,9 @@ using Pub;
 
 namespace Plugin_Hubspot.HubSpotApi
 {
-    public enum DynamicObject
-    {
-        Contacts,
-        Companies,
-        Deals
-    }
-    
     public class DynamicApiSchema : APISchema
     {
         public DynamicObject Object  { get; private set; }
-        
-        public string IdProp { get; private set; }
-        
-        public string Name { get; private set; }
-        
-        public string Description { get; private set; }
 
         public List<APIProperty> Properties { get; }
 
@@ -31,15 +18,10 @@ namespace Plugin_Hubspot.HubSpotApi
         /// the dynamic schemas are schemas that support custom properties.
         /// </summary>
         /// <param name="obj"></param>
-        /// <param name="name"></param>
-        /// <param name="description"></param>
-        /// <param name="properties">Optional list of properties</param>
-        public DynamicApiSchema(DynamicObject obj, string name, string description, string idProp, List<APIProperty> properties = null)
+        /// <param name="properties"></param>
+        public DynamicApiSchema(DynamicObject obj, List<APIProperty> properties = null)
         {
             this.Object = obj;
-            this.Name = name;
-            this.Description = description;
-            this.IdProp = idProp;
             this.Properties = properties ?? new List<APIProperty>();
         }
 
@@ -52,17 +34,17 @@ namespace Plugin_Hubspot.HubSpotApi
         {
             var s = new Schema
             {
-                Id = Enum.GetName(typeof(DynamicObject), this.Object).ToLower(),
-                Name = this.Name,
-                Description = this.Description,
+                Id = this.Object.Id,
+                Name = this.Object.Name,
+                Description = this.Object.Description,
                 DataFlowDirection = Schema.Types.DataFlowDirection.Read
             };
             
             // Add the id property
             s.Properties.Add(new Property
             {
-                Id = IdProp,
-                Name = IdProp,
+                Id = this.Object.IdProp,
+                Name = this.Object.IdProp,
                 Description = "",
                 IsKey = true,
                 Type = PropertyType.String

@@ -27,7 +27,7 @@ namespace Plugin_Hubspot.HubSpotApi
         public async void ShouldReadAllPropertiesFromResponse()
         {
             // Act
-            var ds = await sut.GetDynamicApiSchema(DynamicObject.Contacts, "", "", "Vid");
+            var ds = await sut.GetDynamicApiSchema(DynamicObject.Contacts);
             
             // Assert
             ds.Properties.Should().HaveCount(168, "All of the defined properties plus the Vid");
@@ -37,7 +37,7 @@ namespace Plugin_Hubspot.HubSpotApi
         public async void ShouldDeserializeCorePropertyAttributesCorrectly()
         {
             // Act
-            var ds = await sut.GetDynamicApiSchema(DynamicObject.Contacts, "", "", "");
+            var ds = await sut.GetDynamicApiSchema(DynamicObject.Contacts);
             
             // Assert
             var companySize = ds.Properties.First(p => p.Name == "company_size");

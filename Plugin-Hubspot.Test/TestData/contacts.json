@@ -1,0 +1,98 @@
+{
+  "contacts": [
+    {
+      "addedAt": 1567545258169,
+      "vid": 1,
+      "canonical-vid": 1,
+      "merged-vids": [],
+      "portal-id": 6364843,
+      "is-contact": true,
+      "profile-token": "AO_T-mNuMHWQUNVoQGPyJig9Vmb95Dm9b4_rSUPW9OU5dciyN4O3KAcdOcW7ZbXjyttTN18txGToqqXX1uMhWHyFLlOydNv9MPn6D7Vm3lM3TxybDgcv9FOal1chDMbY5FZIcgDSQy3z",
+      "profile-url": "https://app.hubspot.com/contacts/6364843/contact/1",
+      "properties": {
+        "firstname": {
+          "value": "Cool"
+        },
+        "lastmodifieddate": {
+          "value": "1567545297101"
+        },
+        "company": {
+          "value": "HubSpot"
+        },
+        "lastname": {
+          "value": "Robot (Sample Contact)"
+        }
+      },
+      "form-submissions": [],
+      "identity-profiles": [
+        {
+          "vid": 1,
+          "saved-at-timestamp": 1567545258056,
+          "deleted-changed-timestamp": 0,
+          "identities": [
+            {
+              "type": "EMAIL",
+              "value": "coolrobot@hubspot.com",
+              "timestamp": 1567545257966,
+              "is-primary": true
+            },
+            {
+              "type": "LEAD_GUID",
+              "value": "3ba52f96-f19d-45d1-aa67-710aeb9e78d6",
+              "timestamp": 1567545258053
+            }
+          ]
+        }
+      ],
+      "merge-audits": []
+    },
+    {
+      "addedAt": 1567545258339,
+      "vid": 51,
+      "canonical-vid": 51,
+      "merged-vids": [],
+      "portal-id": 6364843,
+      "is-contact": true,
+      "profile-token": "AO_T-mN6nwYBpkhbHrxu12Q0zHxsrveBxKJNz-Z_0A23Hq8Eqpme1yxqElTcif0bft6MsYKvJbNoB-tMPAbGK0PCdVG-wx35_8QDRDGoaFL5g7UHEcyZxS2Zc5Xb88l48rxiXJsN7P7m",
+      "profile-url": "https://app.hubspot.com/contacts/6364843/contact/51",
+      "properties": {
+        "firstname": {
+          "value": "Brian"
+        },
+        "lastmodifieddate": {
+          "value": "1567545278371"
+        },
+        "company": {
+          "value": "HubSpot"
+        },
+        "lastname": {
+          "value": "Halligan (Sample Contact)"
+        }
+      },
+      "form-submissions": [],
+      "identity-profiles": [
+        {
+          "vid": 51,
+          "saved-at-timestamp": 1567545258216,
+          "deleted-changed-timestamp": 0,
+          "identities": [
+            {
+              "type": "EMAIL",
+              "value": "bh@hubspot.com",
+              "timestamp": 1567545257966,
+              "is-primary": true
+            },
+            {
+              "type": "LEAD_GUID",
+              "value": "4a178114-4e86-4019-aea6-1c6f903b76d2",
+              "timestamp": 1567545258212
+            }
+          ]
+        }
+      ],
+      "merge-audits": []
+    }
+  ],
+  "has-more": false,
+  "vid-offset": 51
+}

@@ -30,6 +30,8 @@ namespace Plugin_Hubspot.Plugin
         private FormSettings _formSettings;
   
         private TaskCompletionSource<bool> _tcs;
+
+        private volatile bool _connected;
         
         public Plugin(HttpClient httpClient = null)
         {
@@ -212,6 +214,8 @@ namespace Plugin_Hubspot.Plugin
                 };
             }
 
+            _connected = true;
+
             return new ConnectResponse
             {
                 ConnectionError = "",
@@ -255,6 +259,8 @@ namespace Plugin_Hubspot.Plugin
                 _tcs = null;
             }
 
+            _connected = false;
+
             Logger.Info("Disconnected");
             return Task.FromResult(new DisconnectResponse());
         }
@@ -283,7 +289,7 @@ namespace Plugin_Hubspot.Plugin
                 if (schemasToLoad.Contains("contacts"))
                 {
                     var contactSchema = await
-                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Contacts, "Contacts", "HubSpot Contacts", "vid");
+                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Contacts);
 
                     discoverSchemasResponse.Schemas.Add(contactSchema.ToSchema());
                 }
@@ -291,7 +297,7 @@ namespace Plugin_Hubspot.Plugin
                 if (schemasToLoad.Contains("companies"))
                 {
                     var companiesSchema = await
-                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Companies, "Companies", "HubSpot Companies", "companyId");
+                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Companies);
 
                     discoverSchemasResponse.Schemas.Add(companiesSchema.ToSchema());
                 }
@@ -299,7 +305,7 @@ namespace Plugin_Hubspot.Plugin
                 if (schemasToLoad.Contains("deals"))
                 {
                     var dealsSchema = await
-                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Deals, "Deals", "HubSpot Deals", "dealId");
+                        _hubSpotClient.GetDynamicApiSchema(DynamicObject.Deals);
 
                     discoverSchemasResponse.Schemas.Add(dealsSchema.ToSchema());
                 }
@@ -312,5 +318,113 @@ namespace Plugin_Hubspot.Plugin
                 throw;
             }  
         }
+        
+        /// <summary>
+        /// Publishes a stream of data for a given schema
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="responseStream"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        /*
+        public override async Task ReadStream(ReadRequest request, IServerStreamWriter<Record> responseStream,
+            ServerCallContext context)
+        {
+            var schema = request.Schema;
+            var limit = request.Limit;
+            var limitFlag = request.Limit != 0;
+
+            Logger.Info($"Publishing records for schema: {schema.Name}");
+
+            try
+            {
+                var recordsCount = 0;
+                var records = new List<Dictionary<string, object>>();
+
+                // get all records
+                // build query string
+                StringBuilder query = new StringBuilder("select+");
+
+                foreach (var property in schema.Properties)
+                {
+                    query.Append($"{property.Id},");
+                }
+
+                // remove trailing comma
+                query.Length--;
+
+                query.Append($"+from+{schema.Id}");
+
+                // get records for schema page by page
+                var response = await _client.GetAsync(String.Format("/query?q={0}", query));
+                response.EnsureSuccessStatusCode();
+
+                var recordsResponse =
+                    JsonConvert.DeserializeObject<RecordsResponse>(await response.Content.ReadAsStringAsync());
+
+                records.AddRange(recordsResponse.Records);
+
+                while (!recordsResponse.Done && _connected)
+                {
+                    response = await _client.GetAsync(recordsResponse.NextRecordsUrl);
+                    response.EnsureSuccessStatusCode();
+
+                    recordsResponse =
+                        JsonConvert.DeserializeObject<RecordsResponse>(await response.Content.ReadAsStringAsync());
+
+                    records.AddRange(recordsResponse.Records);
+                }
+
+                // Publish records for the given schema
+                foreach (var record in records)
+                {
+                    try
+                    {
+                        record.Remove("attributes");
+
+                        foreach (var property in schema.Properties)
+                        {
+                            if (property.Type == PropertyType.String)
+                            {
+                                var value = record[property.Id];
+                                if (!(value is string))
+                                {
+                                    record[property.Id] = JsonConvert.SerializeObject(value);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e.Message);
+                        continue;
+                    }
+
+                    var recordOutput = new Record
+                    {
+                        Action = Record.Types.Action.Upsert,
+                        DataJson = JsonConvert.SerializeObject(record)
+                    };
+
+                    // stop publishing if the limit flag is enabled and the limit has been reached
+                    if ((limitFlag && recordsCount == limit) || !_connected)
+                    {
+                        break;
+                    }
+
+                    // publish record
+                    await responseStream.WriteAsync(recordOutput);
+                    recordsCount++;
+                }
+
+                Logger.Info($"Published {recordsCount} records");
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                throw;
+            }
+        }
+        */
     }
 }

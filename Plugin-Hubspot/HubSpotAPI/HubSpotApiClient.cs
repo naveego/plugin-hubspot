@@ -31,10 +31,10 @@ namespace Plugin_Hubspot.HubSpotApi
             return true;
         }
 
-        public async Task<DynamicApiSchema> GetDynamicApiSchema(DynamicObject obj, string name, string description, string idProp)
+        public async Task<DynamicApiSchema> GetDynamicApiSchema(DynamicObject obj)
         {
             List<APIProperty> properties;
-            var objName = Enum.GetName(typeof(DynamicObject), obj).ToLower();
+            var objName = obj.Id;
             var propertyUrl = $"{ApiUrl}/properties/v1/{objName}/properties";
             
             var resp = await GetAsync(propertyUrl);
@@ -47,7 +47,15 @@ namespace Plugin_Hubspot.HubSpotApi
                 properties = serializer.Deserialize<List<APIProperty>>(jr);
             }
     
-            return new DynamicApiSchema(obj, name, description, idProp, properties);
+            return new DynamicApiSchema(obj, properties);
+        }
+
+        public async Task<ApiRecords> GetRecords(DynamicObject obj, string nextUrl = null)
+        {
+            ApiRecords records = new ApiRecords();
+
+            return await Task.FromResult(records);
+
         }
 
         public void UseApiToken(string apiToken)
@@ -91,6 +99,8 @@ namespace Plugin_Hubspot.HubSpotApi
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
         }
+        
+        
         
         
         
