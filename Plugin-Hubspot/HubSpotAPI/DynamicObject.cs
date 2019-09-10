@@ -44,7 +44,19 @@ namespace Plugin_Hubspot.HubSpotApi
             MustRequestProperties = true,
             GetAllPath = "/deals/v1/deal/paged"
         };
-        
+
+        public static DynamicObject GetByName(string name)
+        {
+            switch (name)
+            {
+                case "companies":
+                    return Companies;
+                case "deals":
+                    return Deals;
+                default:
+                    return Contacts;
+            }
+        }
         
         public string Id { get; set; }
         

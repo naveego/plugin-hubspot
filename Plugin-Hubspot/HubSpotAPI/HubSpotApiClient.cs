@@ -1,12 +1,20 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Data;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Numerics;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Plugin_Hubspot.Helper;
 using Pub;
@@ -15,10 +23,13 @@ namespace Plugin_Hubspot.HubSpotApi
 {
     public class HubSpotApiClient
     {
+        private static readonly DateTime epoch = new DateTime(1970,1,1,0,0,0,0,System.DateTimeKind.Utc);
+        private readonly IDictionary<string, DynamicApiSchema> _schemaCache = new Dictionary<string, DynamicApiSchema>();
         private const string ApiUrl = "https://api.hubapi.com";
         private readonly HttpClient _httpClient;
         private string _apiToken = null;
         private Authenticator _authenticator;
+        
 
         public HubSpotApiClient(HttpClient httpClient = null)
         {
@@ -50,12 +61,62 @@ namespace Plugin_Hubspot.HubSpotApi
             return new DynamicApiSchema(obj, properties);
         }
 
-        public async Task<ApiRecords> GetRecords(DynamicObject obj, string nextUrl = null)
+        public async Task<ApiRecords> GetRecords(DynamicObject obj, int offset = 0)
         {
             ApiRecords records = new ApiRecords();
 
-            return await Task.FromResult(records);
+            if (_schemaCache.TryGetValue(obj.Id, out var apiSchema) == false)
+            {
+                apiSchema = await GetDynamicApiSchema(obj);
+                _schemaCache[obj.Id] = apiSchema;
+            }
 
+            var urlBuilder = new UriBuilder($"{ApiUrl}{obj.GetAllPath}");
+            var queryString = new NameValueCollection();
+
+            if (offset >= 0)
+            {
+                queryString[obj.RequestOffsetProperty] = offset.ToString();
+            }
+
+            var query = queryString.ToString();
+            
+            if (obj.MustRequestProperties)
+            {
+                foreach (var p in apiSchema.Properties)
+                {
+                    query += $"&properties={p.Name}";
+                }
+            }
+
+            urlBuilder.Query = query;
+        
+            var resp = await GetAsync(urlBuilder.ToString());
+            var respJson = await resp.Content.ReadAsStringAsync();
+
+            var apiJson = JObject.Parse(respJson);
+
+            records.HasMore = (bool)apiJson[obj.ResponseHasMoreProperty];
+            records.Offset = (int)apiJson[obj.ResponseOffsetProperty];
+
+            foreach (JObject item in apiJson[obj.ResponseDataProperty])
+            {
+                var data = new Dictionary<string, object>();
+
+                foreach (var prop in apiSchema.Properties)
+                {
+                    var (exists, val) = ConvertValue(item, prop);
+                    if (exists)
+                    {
+                        data[prop.Name] = val;
+                    }
+                }
+                
+                records.Add(data);
+            }
+            
+
+            return await Task.FromResult(records);
         }
 
         public void UseApiToken(string apiToken)
@@ -99,10 +160,52 @@ namespace Plugin_Hubspot.HubSpotApi
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
         }
-        
-        
-        
-        
-        
+
+        private (bool, object) ConvertValue(JObject record, APIProperty apiProp)
+        {
+            var propertiesObj = (JObject) record["properties"];
+            dynamic prop = propertiesObj.Properties().FirstOrDefault(p => p.Name == apiProp.Name);
+            if (prop == null)
+            {
+                return (false, null);
+            }
+
+            var propVal = prop.Value;
+
+            if (!(propVal is JObject))
+            {
+                return (false, null);
+            }
+
+            var rawVal = ((JObject) propVal)["value"];
+
+            if (propVal.Type == JTokenType.Null)
+            {
+                return (true, null);
+            }
+
+            var stringVal = (string) rawVal;
+
+            decimal n = 0;
+            if(apiProp.Type == "number" && decimal.TryParse(stringVal, out n))
+            {
+                return (true, n);
+            }
+
+            bool b = false;
+            if (apiProp.Type == "bool" && bool.TryParse(stringVal, out b))
+            {
+                return (true, b);
+            }
+
+            long ts = 0;
+            if (apiProp.Type == "datetime" && long.TryParse(stringVal, out ts))
+            {
+                var dt = epoch.AddMilliseconds(ts);
+                return (true, dt);
+            }
+
+            return (true, stringVal);
+        }
     }
 }

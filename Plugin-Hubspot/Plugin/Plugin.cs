@@ -326,11 +326,11 @@ namespace Plugin_Hubspot.Plugin
         /// <param name="responseStream"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        /*
         public override async Task ReadStream(ReadRequest request, IServerStreamWriter<Record> responseStream,
             ServerCallContext context)
         {
             var schema = request.Schema;
+            var dynamicObject = DynamicObject.GetByName(schema.Id);
             var limit = request.Limit;
             var limitFlag = request.Limit != 0;
 
@@ -355,51 +355,20 @@ namespace Plugin_Hubspot.Plugin
 
                 query.Append($"+from+{schema.Id}");
 
-                // get records for schema page by page
-                var response = await _client.GetAsync(String.Format("/query?q={0}", query));
-                response.EnsureSuccessStatusCode();
+                ApiRecords apiRecords;
+                int offset = 0;
 
-                var recordsResponse =
-                    JsonConvert.DeserializeObject<RecordsResponse>(await response.Content.ReadAsStringAsync());
-
-                records.AddRange(recordsResponse.Records);
-
-                while (!recordsResponse.Done && _connected)
+                do
                 {
-                    response = await _client.GetAsync(recordsResponse.NextRecordsUrl);
-                    response.EnsureSuccessStatusCode();
-
-                    recordsResponse =
-                        JsonConvert.DeserializeObject<RecordsResponse>(await response.Content.ReadAsStringAsync());
-
-                    records.AddRange(recordsResponse.Records);
-                }
+                    // get records for schema page by page
+                    apiRecords = await _hubSpotClient.GetRecords(dynamicObject, offset);
+                    records.AddRange((apiRecords.Records));
+                    offset = apiRecords.Offset;
+                } while (apiRecords.HasMore && _connected);
 
                 // Publish records for the given schema
                 foreach (var record in records)
                 {
-                    try
-                    {
-                        record.Remove("attributes");
-
-                        foreach (var property in schema.Properties)
-                        {
-                            if (property.Type == PropertyType.String)
-                            {
-                                var value = record[property.Id];
-                                if (!(value is string))
-                                {
-                                    record[property.Id] = JsonConvert.SerializeObject(value);
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e.Message);
-                        continue;
-                    }
-
                     var recordOutput = new Record
                     {
                         Action = Record.Types.Action.Upsert,
@@ -425,6 +394,8 @@ namespace Plugin_Hubspot.Plugin
                 throw;
             }
         }
-        */
+
+       
+        
     }
 }
