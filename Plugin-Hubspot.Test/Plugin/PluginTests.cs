@@ -252,7 +252,55 @@ namespace Plugin_Hubspot.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
+        [Fact]
+        public async Task ReadStreamTest()
+        {
+            // setup
+            var mockHttp = GetMockHttpMessageHandler();
+
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new Plugin_Hubspot.Plugin.Plugin(mockHttp.ToHttpClient()))},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var connectRequest = GetConnectSettings();
+
+            var request = new ReadRequest()
+            {
+                Schema = new Schema
+                {
+                    Id = "Contacts"
+                }
+            };
+
+            // act
+            client.Connect(connectRequest);
+            var response = client.ReadStream(request);
+            var responseStream = response.ResponseStream;
+            var records = new List<Pub.Record>();
+
+            while (await responseStream.MoveNext())
+            {
+                records.Add(responseStream.Current);
+            }
+
+            // assert
+            Assert.Equal(2, records.Count);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+
+
         private ConnectRequest GetConnectSettings()
         {
             return new ConnectRequest
@@ -287,6 +335,10 @@ namespace Plugin_Hubspot.Plugin
             
             mockHttp.When("https://api.hubapi.com/properties/v1/deals/properties")
                 .RespondWithJsonFile("TestData/deals.properties.json");
+                
+            mockHttp.When("https://api.hubapi.com/contacts/v1/lists/all/contacts/all")
+                .RespondWithJsonFile("TestData/contacts.json");
+
 
             return mockHttp;
         }

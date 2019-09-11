@@ -103,6 +103,9 @@ namespace Plugin_Hubspot.HubSpotApi
             {
                 var data = new Dictionary<string, object>();
 
+                // inject the id property
+                data[obj.IdProp] = item[obj.IdProp].ToString();
+                
                 foreach (var prop in apiSchema.Properties)
                 {
                     var (exists, val) = ConvertValue(item, prop);

@@ -38,5 +38,18 @@ namespace Plugin_Hubspot.HubSpotApi
             record["lastmodifieddate"].Should().Be(new DateTime(2019, 9, 3, 21,14,57,101));
             record["company"].Should().Be("HubSpot");
         }
+        
+        [Fact]
+        public async void ShouldInjectTheIdPropValue()
+        {
+            // Act
+            var ds = await sut.GetRecords(DynamicObject.Contacts);
+            
+            // Assert
+            ds.Records.Count.Should().Be(2, "that is how many records there are");
+            var record = ds.Records.First();
+            record["vid"].Should().Be("1");
+          
+        }
     }
 }
