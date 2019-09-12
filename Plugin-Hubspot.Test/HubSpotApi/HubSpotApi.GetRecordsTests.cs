@@ -21,8 +21,14 @@ namespace Plugin_Hubspot.HubSpotApi
             mockHttp.When("https://api.hubapi.com/contacts/v1/lists/all/contacts/all")
                 .RespondWithJsonFile("TestData/contacts.json");
             
+            mockHttp.When("https://api.hubapi.com/companies/v2/companies/paged")
+                .RespondWithJsonFile("TestData/companies.json");
+            
             mockHttp.When("https://api.hubapi.com/properties/v1/contacts/properties")
                 .RespondWithJsonFile("TestData/contact.properties.json");
+            
+            mockHttp.When("https://api.hubapi.com/properties/v1/companies/properties")
+                .RespondWithJsonFile("TestData/companies.properties.json");
         }
 
         [Fact]
@@ -37,6 +43,17 @@ namespace Plugin_Hubspot.HubSpotApi
             record["firstname"].Should().Be("Cool");
             record["lastmodifieddate"].Should().Be(new DateTime(2019, 9, 3, 21,14,57,101));
             record["company"].Should().Be("HubSpot");
+        }
+        
+        [Fact]
+        public async void CanReadCompanies()
+        {
+            // Act
+            var ds = await sut.GetRecords(DynamicObject.Companies);
+            
+            // Assert
+            ds.Records.Count.Should().Be(1, "that is how many records there are");
+         
         }
         
         [Fact]

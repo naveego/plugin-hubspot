@@ -1,0 +1,680 @@
+{
+  "has-more": false,
+  "offset": 2389703264,
+  "companies": [
+    {
+      "portalId": 6364843,
+      "companyId": 2389703264,
+      "isDeleted": false,
+      "properties": {
+        "country": {
+          "value": "United States",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "country",
+              "value": "United States",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "city": {
+          "value": "Traverse City",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "city",
+              "value": "Traverse City",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "timezone": {
+          "value": "America/Detroit",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "timezone",
+              "value": "America/Detroit",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "facebook_company_page": {
+          "value": "https://facebook.com/naveego",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "facebook_company_page",
+              "value": "https://facebook.com/naveego",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "description": {
+          "value": "A next-generation, hybrid and multi-cloud data accuracy platform that proactively manages, detects and eliminates data accuracy issues across all of your enterprise data sources.",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "description",
+              "value": "A next-generation, hybrid and multi-cloud data accuracy platform that proactively manages, detects and eliminates data accuracy issues across all of your enterprise data sources.",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "createdate": {
+          "value": "1567968131231",
+          "timestamp": 1567968131231,
+          "source": "CONTACTS",
+          "sourceId": "CRM_UI",
+          "versions": [
+            {
+              "name": "createdate",
+              "value": "1567968131231",
+              "timestamp": 1567968131231,
+              "sourceId": "CRM_UI",
+              "source": "CONTACTS",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "web_technologies": {
+          "value": "microsoft_exchange_online;youtube;aws_route_53;facebook_connect;facebook_advertiser;lucky_orange;zendesk;microsoft_office_365;cloud_flare;google_analytics;twitter_button;piwik;hubspot;outlook",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "web_technologies",
+              "value": "microsoft_exchange_online;youtube;aws_route_53;facebook_connect;facebook_advertiser;lucky_orange;zendesk;microsoft_office_365;cloud_flare;google_analytics;twitter_button;piwik;hubspot;outlook",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "total_money_raised": {
+          "value": "500K",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "total_money_raised",
+              "value": "500K",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "industry": {
+          "value": "INFORMATION_TECHNOLOGY_AND_SERVICES",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "industry",
+              "value": "INFORMATION_TECHNOLOGY_AND_SERVICES",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "numberofemployees": {
+          "value": "10",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "numberofemployees",
+              "value": "10",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "days_to_close": {
+          "value": "0",
+          "timestamp": 1568039812183,
+          "source": "DEALS",
+          "sourceId": "deals-lifecycle-sync",
+          "versions": [
+            {
+              "name": "days_to_close",
+              "value": "0",
+              "timestamp": 1568039812183,
+              "sourceId": "deals-lifecycle-sync",
+              "source": "DEALS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "linkedin_company_page": {
+          "value": "https://www.linkedin.com/company/naveego-inc-",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "linkedin_company_page",
+              "value": "https://www.linkedin.com/company/naveego-inc-",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "hubspot_owner_id": {
+          "value": "38888745",
+          "timestamp": 1567968131231,
+          "source": "CRM_UI",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "hubspot_owner_id",
+              "value": "38888745",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "CRM_UI",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "recent_deal_amount": {
+          "value": "3.5",
+          "timestamp": 1568039812208,
+          "source": "DEALS",
+          "sourceId": "DealRollupProperties",
+          "versions": [
+            {
+              "name": "recent_deal_amount",
+              "value": "3.5",
+              "timestamp": 1568039812208,
+              "sourceId": "DealRollupProperties",
+              "source": "DEALS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "num_contacted_notes": {
+          "value": "0",
+          "timestamp": 1568039674877,
+          "source": "ENGAGEMENTS",
+          "sourceId": "ObjectPropertyUpdater",
+          "versions": [
+            {
+              "name": "num_contacted_notes",
+              "value": "0",
+              "timestamp": 1568039674877,
+              "sourceId": "ObjectPropertyUpdater",
+              "source": "ENGAGEMENTS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "first_deal_created_date": {
+          "value": "1568038364515",
+          "timestamp": 1568038395023,
+          "source": "DEALS",
+          "sourceId": "DealRollupProperties",
+          "versions": [
+            {
+              "name": "first_deal_created_date",
+              "value": "1568038364515",
+              "timestamp": 1568038395023,
+              "sourceId": "DealRollupProperties",
+              "source": "DEALS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "annualrevenue": {
+          "value": "10000000",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "annualrevenue",
+              "value": "10000000",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "founded_year": {
+          "value": "2014",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "founded_year",
+              "value": "2014",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "num_associated_deals": {
+          "value": "3",
+          "timestamp": 1568039837832,
+          "source": "DEALS",
+          "sourceId": "DealRollupProperties",
+          "versions": [
+            {
+              "name": "num_associated_deals",
+              "value": "3",
+              "timestamp": 1568039837832,
+              "sourceId": "DealRollupProperties",
+              "source": "DEALS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "state": {
+          "value": "MI",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "state",
+              "value": "MI",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "hs_all_owner_ids": {
+          "value": "38888745",
+          "timestamp": 1567968131783,
+          "source": "CRM_UI",
+          "sourceId": "PermissionsUpdater",
+          "versions": [
+            {
+              "name": "hs_all_owner_ids",
+              "value": "38888745",
+              "timestamp": 1567968131783,
+              "sourceId": "PermissionsUpdater",
+              "source": "CRM_UI",
+              "sourceVid": []
+            }
+          ]
+        },
+        "notes_next_activity_date": {
+          "value": "",
+          "timestamp": 1568117156289,
+          "source": "ENGAGEMENTS",
+          "sourceId": "ObjectPropertyUpdater",
+          "versions": [
+            {
+              "name": "notes_next_activity_date",
+              "value": "",
+              "timestamp": 1568117156289,
+              "sourceId": "ObjectPropertyUpdater",
+              "source": "ENGAGEMENTS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "linkedinbio": {
+          "value": "A next-generation, hybrid and multi-cloud data accuracy platform that proactively manages, detects and eliminates data accuracy issues across all of your enterprise data sources.",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "linkedinbio",
+              "value": "A next-generation, hybrid and multi-cloud data accuracy platform that proactively manages, detects and eliminates data accuracy issues across all of your enterprise data sources.",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "zip": {
+          "value": "49686",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "zip",
+              "value": "49686",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "notes_last_updated": {
+          "value": "1568116800000",
+          "timestamp": 1568117156289,
+          "source": "ENGAGEMENTS",
+          "sourceId": "ObjectPropertyUpdater",
+          "versions": [
+            {
+              "name": "notes_last_updated",
+              "value": "1568116800000",
+              "timestamp": 1568117156289,
+              "sourceId": "ObjectPropertyUpdater",
+              "source": "ENGAGEMENTS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "website": {
+          "value": "naveego.com",
+          "timestamp": 1567968131231,
+          "source": "CALCULATED",
+          "sourceId": null,
+          "versions": [
+            {
+              "name": "website",
+              "value": "naveego.com",
+              "timestamp": 1567968131231,
+              "source": "CALCULATED",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "closedate": {
+          "value": "1568039812183",
+          "timestamp": 1568039812183,
+          "source": "DEALS",
+          "sourceId": "deals-lifecycle-sync",
+          "versions": [
+            {
+              "name": "closedate",
+              "value": "1568039812183",
+              "timestamp": 1568039812183,
+              "sourceId": "deals-lifecycle-sync",
+              "source": "DEALS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "address": {
+          "value": "1771 Park Drive",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "address",
+              "value": "1771 Park Drive",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "recent_deal_close_date": {
+          "value": "1568039804374",
+          "timestamp": 1568039812208,
+          "source": "DEALS",
+          "sourceId": "DealRollupProperties",
+          "versions": [
+            {
+              "name": "recent_deal_close_date",
+              "value": "1568039804374",
+              "timestamp": 1568039812208,
+              "sourceId": "DealRollupProperties",
+              "source": "DEALS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "twitterhandle": {
+          "value": "Naveego",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "twitterhandle",
+              "value": "Naveego",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "hs_lastmodifieddate": {
+          "value": "1568117156385",
+          "timestamp": 1568117156385,
+          "source": "CALCULATED",
+          "sourceId": null,
+          "versions": [
+            {
+              "name": "hs_lastmodifieddate",
+              "value": "1568117156385",
+              "timestamp": 1568117156385,
+              "source": "CALCULATED",
+              "sourceVid": []
+            }
+          ]
+        },
+        "phone": {
+          "value": "+1 231-346-4144",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "phone",
+              "value": "+1 231-346-4144",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "hubspot_owner_assigneddate": {
+          "value": "1567968131231",
+          "timestamp": 1567968131231,
+          "source": "CRM_UI",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "hubspot_owner_assigneddate",
+              "value": "1567968131231",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "CRM_UI",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "total_revenue": {
+          "value": "3.5",
+          "timestamp": 1568039812208,
+          "source": "DEALS",
+          "sourceId": "DealRollupProperties",
+          "versions": [
+            {
+              "name": "total_revenue",
+              "value": "3.5",
+              "timestamp": 1568039812208,
+              "sourceId": "DealRollupProperties",
+              "source": "DEALS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "domain": {
+          "value": "naveego.com",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "domain",
+              "value": "naveego.com",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "name": {
+          "value": "Naveego, Inc.",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "name",
+              "value": "Naveego, Inc.",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "is_public": {
+          "value": "false",
+          "timestamp": 1567968131231,
+          "source": "BIDEN",
+          "sourceId": "derek.smith@naveego.com",
+          "versions": [
+            {
+              "name": "is_public",
+              "value": "false",
+              "timestamp": 1567968131231,
+              "sourceId": "derek.smith@naveego.com",
+              "source": "BIDEN",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "hs_object_id": {
+          "value": "2389703264",
+          "timestamp": 1567968131231,
+          "source": "CONTACTS",
+          "sourceId": "CRM_UI",
+          "versions": [
+            {
+              "name": "hs_object_id",
+              "value": "2389703264",
+              "timestamp": 1567968131231,
+              "sourceId": "CRM_UI",
+              "source": "CONTACTS",
+              "sourceVid": [],
+              "requestId": "ec7d12ba-40db-4949-ad77-7a7b82af205a"
+            }
+          ]
+        },
+        "lifecyclestage": {
+          "value": "customer",
+          "timestamp": 1568039812183,
+          "source": "DEALS",
+          "sourceId": "deals-lifecycle-sync",
+          "versions": [
+            {
+              "name": "lifecyclestage",
+              "value": "customer",
+              "timestamp": 1568039812183,
+              "sourceId": "deals-lifecycle-sync",
+              "source": "DEALS",
+              "sourceVid": []
+            }
+          ]
+        },
+        "num_notes": {
+          "value": "1",
+          "timestamp": 1568039674877,
+          "source": "ENGAGEMENTS",
+          "sourceId": "ObjectPropertyUpdater",
+          "versions": [
+            {
+              "name": "num_notes",
+              "value": "1",
+              "timestamp": 1568039674877,
+              "sourceId": "ObjectPropertyUpdater",
+              "source": "ENGAGEMENTS",
+              "sourceVid": []
+            }
+          ]
+        }
+      },
+      "additionalDomains": [],
+      "stateChanges": [],
+      "mergeAudits": []
+    }
+  ]
+}

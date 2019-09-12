@@ -9,7 +9,7 @@ namespace Plugin_Hubspot.HubSpotApi
 
         public bool HasMore { get; set; }
         
-        public int Offset { get; set; }
+        public long Offset { get; set; }
 
         public void Add(Dictionary<string, object> record)
         {

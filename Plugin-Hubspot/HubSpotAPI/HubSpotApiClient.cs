@@ -61,7 +61,7 @@ namespace Plugin_Hubspot.HubSpotApi
             return new DynamicApiSchema(obj, properties);
         }
 
-        public async Task<ApiRecords> GetRecords(DynamicObject obj, int offset = 0)
+        public async Task<ApiRecords> GetRecords(DynamicObject obj, long offset = 0)
         {
             ApiRecords records = new ApiRecords();
 
@@ -72,7 +72,7 @@ namespace Plugin_Hubspot.HubSpotApi
             }
 
             var urlBuilder = new UriBuilder($"{ApiUrl}{obj.GetAllPath}");
-            var queryString = new NameValueCollection();
+            var queryString = HttpUtility.ParseQueryString(String.Empty);
 
             if (offset >= 0)
             {
@@ -97,7 +97,7 @@ namespace Plugin_Hubspot.HubSpotApi
             var apiJson = JObject.Parse(respJson);
 
             records.HasMore = (bool)apiJson[obj.ResponseHasMoreProperty];
-            records.Offset = (int)apiJson[obj.ResponseOffsetProperty];
+            records.Offset = (long)apiJson[obj.ResponseOffsetProperty];
 
             foreach (JObject item in apiJson[obj.ResponseDataProperty])
             {

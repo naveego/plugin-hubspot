@@ -356,7 +356,7 @@ namespace Plugin_Hubspot.Plugin
                 query.Append($"+from+{schema.Id}");
 
                 ApiRecords apiRecords;
-                int offset = 0;
+                long offset = 0;
 
                 do
                 {
