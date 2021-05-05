@@ -6,7 +6,7 @@
   "versionDescription": "Version 2",
   "version": "1.0.5",
   "iconFile": "icon.jpg",
-  "executable": "Plugin-Hubspot",
+  "executable": "PluginHubspot",
   "kind": "publisher",
   "os": "$GOOS",
   "arch": "$GOARCH",
