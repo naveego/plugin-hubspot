@@ -8,6 +8,7 @@ using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginHubspot.API.Read;
 using PluginHubspot.API.Utility;
+using PluginHubspot.DataContracts;
 using PluginHubspot.Helper;
 using Xunit;
 using Record = Naveego.Sdk.Plugins.Record;
@@ -16,23 +17,48 @@ namespace PluginHubspotTest.Plugin
 {
     public class PluginIntegrationTest
     {
-        private Settings GetSettings()
+        private Settings GetSettings(bool oAuth = false)
         {
-            return new Settings
-            {
-                ApiKey = "e7019425-1e8a-42b9-993d-cec8796f928d",
-            };
+            return oAuth
+                ? new Settings
+                {
+                }
+                : new Settings
+                {
+                    ApiKey = "", // add to test
+                };
         }
 
-        private ConnectRequest GetConnectSettings()
+        private ConnectRequest GetConnectSettings(bool oAuth = false)
         {
-            var settings = GetSettings();
-
+            var settings = GetSettings(oAuth);
+                
+            var oAuthConfig = oAuth
+                ? new OAuthConfiguration
+                {
+                    ClientId = "", // add to test
+                    ClientSecret = "", // add to test
+                }
+                : new OAuthConfiguration
+                {
+                };
+            
+            var oAuthState = oAuth
+                ? new OAuthState
+                {
+                    RefreshToken = "", // add to test
+                    Config = JsonConvert.SerializeObject(new OAuthConfig
+                    {
+                        RedirectUri = "" // add to test
+                    })
+                }
+                : new OAuthState();
+            
             return new ConnectRequest
             {
                 SettingsJson = JsonConvert.SerializeObject(settings),
-                OauthConfiguration = new OAuthConfiguration(),
-                OauthStateJson = ""
+                OauthConfiguration = oAuthConfig,
+                OauthStateJson = JsonConvert.SerializeObject(oAuthState)
             };
         }
 
@@ -106,6 +132,38 @@ namespace PluginHubspotTest.Plugin
             var client = new Publisher.PublisherClient(channel);
 
             var request = GetConnectSettings();
+
+            // act
+            var response = client.Connect(request);
+
+            // assert
+            Assert.IsType<ConnectResponse>(response);
+            Assert.Equal("", response.SettingsError);
+            Assert.Equal("", response.ConnectionError);
+            Assert.Equal("", response.OauthError);
+
+            // cleanup
+            await channel.ShutdownAsync();
+            await server.ShutdownAsync();
+        }
+        
+        [Fact]
+        public async Task ConnectOAuthTest()
+        {
+            // setup
+            Server server = new Server
+            {
+                Services = {Publisher.BindService(new PluginHubspot.Plugin.Plugin())},
+                Ports = {new ServerPort("localhost", 0, ServerCredentials.Insecure)}
+            };
+            server.Start();
+
+            var port = server.Ports.First().BoundPort;
+
+            var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
+            var client = new Publisher.PublisherClient(channel);
+
+            var request = GetConnectSettings(true);
 
             // act
             var response = client.Connect(request);
@@ -303,7 +361,7 @@ namespace PluginHubspotTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamSubscriberTest()
         {
@@ -421,7 +479,7 @@ namespace PluginHubspotTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task ReadStreamRealTimeTest()
         {
@@ -495,7 +553,7 @@ namespace PluginHubspotTest.Plugin
             await channel.ShutdownAsync();
             await server.ShutdownAsync();
         }
-        
+
         [Fact]
         public async Task WriteTest()
         {
@@ -530,7 +588,8 @@ namespace PluginHubspotTest.Plugin
                         Action = Record.Types.Action.Upsert,
                         CorrelationId = "test",
                         RecordId = "record1",
-                        DataJson = "{\"Account PKey\":\"\",\"ZZN9X\":\"\",\"FirstName\":\"Molly\",\"LastName\":\"Male\",\"Owner Email\":null,\"Owner First Name\":\"Jenna\",\"Owner Last Name\":\"Jenna\",\"Phone\":\"(263) 83-25052\",\"IPAddress\":null,\"EmailAddress\":\"otgqeeld5@ofrb.zsamvv.net\",\"Lists\":\"[]\"}",
+                        DataJson =
+                            "{\"Account PKey\":\"\",\"ZZN9X\":\"\",\"FirstName\":\"Molly\",\"LastName\":\"Male\",\"Owner Email\":null,\"Owner First Name\":\"Jenna\",\"Owner Last Name\":\"Jenna\",\"Phone\":\"(263) 83-25052\",\"IPAddress\":null,\"EmailAddress\":\"otgqeeld5@ofrb.zsamvv.net\",\"Lists\":\"[]\"}",
                     }
                 }
             };

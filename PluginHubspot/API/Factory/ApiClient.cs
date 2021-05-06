@@ -32,7 +32,7 @@ namespace PluginHubspot.API.Factory
             try
             {
                 var token = await Authenticator.GetToken();
-                var uriBuilder = new UriBuilder($"{Constants.BaseApiUrl.TrimEnd('/')}/{Utility.Constants.TestConnectionPath}");
+                var uriBuilder = new UriBuilder($"{Constants.BaseApiUrl.TrimEnd('/')}/{Utility.Constants.TestConnectionPath.TrimStart('/')}");
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
 
                 if (!string.IsNullOrWhiteSpace(Settings.ApiKey))

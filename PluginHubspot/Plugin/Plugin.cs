@@ -205,7 +205,7 @@ namespace PluginHubspot.Plugin
             try
             {
                 oAuthState = JsonConvert.DeserializeObject<OAuthState>(request.OauthStateJson);
-                oAuthConfig = JsonConvert.DeserializeObject<OAuthConfig>(oAuthState.Config);
+                oAuthConfig = JsonConvert.DeserializeObject<OAuthConfig>(oAuthState?.Config ?? "{}");
             }
             catch (Exception e)
             {
