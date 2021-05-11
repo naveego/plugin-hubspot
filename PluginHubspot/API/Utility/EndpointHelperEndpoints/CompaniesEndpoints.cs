@@ -15,30 +15,30 @@ using PluginHubspot.DataContracts;
 
 namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
 {
-    public class ContactsEndpointHelper
+    public class CompaniesEndpointHelper
     {
-        private class ContactsResponse
+        private class CompaniesResponse
         {
-            [JsonProperty("contacts")] public List<Contact> Contacts { get; set; }
+            [JsonProperty("companies")] public List<Company> Companies { get; set; }
 
             [JsonProperty("has-more")] public bool HasMore { get; set; }
 
-            [JsonProperty("vid-offset")] public long VidOffset { get; set; }
+            [JsonProperty("companyId")] public long Offset { get; set; }
         }
 
-        private class Contact
+        private class Company
         {
-            [JsonProperty("vid")] public long Vid { get; set; }
+            [JsonProperty("companyId")] public long CompanyId { get; set; }
 
-            [JsonProperty("properties")] public Dictionary<string, ContactProperty> Properties { get; set; }
+            [JsonProperty("properties")] public Dictionary<string, CompanyProperty> Properties { get; set; }
         }
 
-        private class ContactProperty
+        private class CompanyProperty
         {
             [JsonProperty("value")] public object Value { get; set; }
         }
 
-        private class ContactPropertyMetadata
+        private class CompanyPropertyMetadata
         {
             [JsonProperty("name")] public string Name { get; set; }
 
@@ -47,32 +47,32 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
             [JsonProperty("type")] public string Type { get; set; }
         }
 
-        private class ContactsEndpoint : Endpoint
+        private class CompaniesEndpoint : Endpoint
         {
-            private const string ContactPropertiesPath = "/properties/v1/contacts/properties";
+            private const string CompanyPropertiesPath = "/properties/v1/companies/properties/";
 
             public override bool ShouldGetStaticSchema { get; set; } = true;
 
             public override async Task<Schema> GetStaticSchemaAsync(IApiClient apiClient, Schema schema)
             {
-                // invoke contacts properties api
-                var response = await apiClient.GetAsync(ContactPropertiesPath);
+                // invoke companies properties api
+                var response = await apiClient.GetAsync(CompanyPropertiesPath);
 
-                var contactProperties =
-                    JsonConvert.DeserializeObject<List<ContactPropertyMetadata>>(
+                var companyProperties =
+                    JsonConvert.DeserializeObject<List<CompanyPropertyMetadata>>(
                         await response.Content.ReadAsStringAsync());
 
                 var properties = new List<Property>();
 
-                foreach (var contactProperty in contactProperties)
+                foreach (var companyProperty in companyProperties)
                 {
                     properties.Add(new Property
                     {
-                        Id = contactProperty.Name,
-                        Name = contactProperty.Name,
-                        Description = contactProperty.Description,
-                        Type = Discover.Discover.GetPropertyType(contactProperty.Type),
-                        TypeAtSource = contactProperty.Type,
+                        Id = companyProperty.Name,
+                        Name = companyProperty.Name,
+                        Description = companyProperty.Description,
+                        Type = Discover.Discover.GetPropertyType(companyProperty.Type),
+                        TypeAtSource = companyProperty.Type,
                         IsKey = false,
                         IsNullable = true,
                         IsCreateCounter = false,
@@ -82,8 +82,8 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
 
                 properties.Add(new Property
                 {
-                    Id = "vid",
-                    Name = "vid",
+                    Id = "companyId",
+                    Name = "companyId",
                     Description = "",
                     Type = PropertyType.String,
                     TypeAtSource = "",
@@ -102,44 +102,44 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                 DateTime? lastReadTime = null, TaskCompletionSource<DateTime>? tcs = null, bool isDiscoverRead = false)
             {
                 var countPerPage = 100;
-                long vidOffset = -1;
+                long offset = -1;
                 var hasMore = false;
 
                 do
                 {
                     var response = await apiClient.GetAsync(
-                        $"{BasePath.TrimEnd('/')}/{AllPath.TrimStart('/')}?{(vidOffset == -1 ? "" : $"vidOffset={vidOffset}&")}count={countPerPage}");
+                        $"{BasePath.TrimEnd('/')}/{AllPath.TrimStart('/')}?{(offset == -1 ? "" : $"vidOffset={offset}&")}count={countPerPage}");
 
                     response.EnsureSuccessStatusCode();
 
-                    var contactsResponse =
-                        JsonConvert.DeserializeObject<ContactsResponse>(await response.Content.ReadAsStringAsync());
+                    var companiesResponse =
+                        JsonConvert.DeserializeObject<CompaniesResponse>(await response.Content.ReadAsStringAsync());
 
-                    hasMore = contactsResponse.HasMore;
-                    vidOffset = contactsResponse.VidOffset;
+                    hasMore = companiesResponse.HasMore;
+                    offset = companiesResponse.Offset;
 
-                    if (contactsResponse.Contacts.Count == 0)
+                    if (companiesResponse.Companies.Count == 0)
                     {
                         yield break;
                     }
 
-                    foreach (var contact in contactsResponse.Contacts)
+                    foreach (var company in companiesResponse.Companies)
                     {
                         var recordMap = new Dictionary<string, object>();
 
-                        recordMap["vid"] = contact.Vid;
+                        recordMap["companyId"] = company.CompanyId;
 
                         var detailsResponse =
-                            await apiClient.GetAsync($"{BasePath.TrimEnd('/')}/{string.Format(DetailPath.TrimStart('/'), contact.Vid)}");
+                            await apiClient.GetAsync($"{BasePath.TrimEnd('/')}/{string.Format(DetailPath.TrimStart('/'), company.CompanyId)}");
                         
                         detailsResponse.EnsureSuccessStatusCode();
 
-                        var detailsContact =
-                            JsonConvert.DeserializeObject<Contact>(await detailsResponse.Content.ReadAsStringAsync());
+                        var detailsCompany =
+                            JsonConvert.DeserializeObject<Company>(await detailsResponse.Content.ReadAsStringAsync());
 
-                        foreach (var contactProperty in detailsContact.Properties)
+                        foreach (var companyProperty in detailsCompany.Properties)
                         {
-                            recordMap[contactProperty.Key] = contactProperty.Value.Value.ToString() ?? "";
+                            recordMap[companyProperty.Key] = companyProperty.Value.Value.ToString() ?? "";
                         }
 
                         yield return new Record
@@ -152,24 +152,24 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
             }
         }
 
-        public static readonly Dictionary<string, Endpoint> ContactsEndpoints = new Dictionary<string, Endpoint>
+        public static readonly Dictionary<string, Endpoint> CompaniesEndpoints = new Dictionary<string, Endpoint>
         {
             {
-                "Contacts", new ContactsEndpoint
+                "Companies", new CompaniesEndpoint
                 {
-                    Id = "Contacts",
-                    Name = "Contacts",
-                    BasePath = "/contacts/v1",
-                    AllPath = "/lists/all/contacts/all",
-                    DetailPath = "/contact/vid/{0}/profile",
-                    DetailPropertyId = "vid",
+                    Id = "Companies",
+                    Name = "Companies",
+                    BasePath = "/companies/v2/companies",
+                    AllPath = "/paged",
+                    DetailPath = "/{0}",
+                    DetailPropertyId = "companyId",
                     SupportedActions = new List<EndpointActions>
                     {
                         EndpointActions.Get
                     },
                     PropertyKeys = new List<string>
                     {
-                        "vid"
+                        "companyId"
                     }
                 }
             }

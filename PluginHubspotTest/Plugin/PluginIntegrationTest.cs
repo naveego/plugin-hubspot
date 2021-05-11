@@ -195,7 +195,7 @@ namespace PluginHubspotTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var connectRequest = GetConnectSettings();
+            var connectRequest = GetConnectSettings(true);
 
             var request = new DiscoverSchemasRequest
             {
