@@ -22,6 +22,12 @@ namespace PluginHubspot.API.Utility
         {
             ContactsEndpointHelper.ContactsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             CompaniesEndpointHelper.CompaniesEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            DealsEndpointHelper.DealsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            EngagementsEndpointHelper.EngagementsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            FeedbackSubmissionsEndpointHelper.FeedbackSubmissionsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            LineItemsEndpointHelper.LineItemsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            ProductsEndpointHelper.ProductsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            TicketsEndpointHelper.TicketsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
         }
 
         public static Dictionary<string, Endpoint> GetAllEndpoints()
@@ -46,6 +52,7 @@ namespace PluginHubspot.API.Utility
     {
         public string Id { get; set; } = "";
         public string Name { get; set; } = "";
+        public string PropertiesPath { get; set; } = "";
         public string BasePath { get; set; } = "";
         public string AllPath { get; set; } = "";
         public string? DetailPath { get; set; }
@@ -70,10 +77,45 @@ namespace PluginHubspot.API.Utility
             });
         }
 
-        public virtual IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient,
-            DateTime? lastReadTime = null, TaskCompletionSource<DateTime>? tcs = null, bool isDiscoverRead = false)
+        public virtual async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, bool isDiscoverRead = false)
         {
-            throw new NotImplementedException();
+            var after = "";
+            var hasMore = false;
+
+            do
+            {
+                var response = await apiClient.GetAsync(
+                    $"{BasePath.TrimEnd('/')}/{AllPath.TrimStart('/')}?{string.Join(",",schema.Properties.Select(p => p.Id))}{(string.IsNullOrWhiteSpace(after) ? "" : $"&after={after}")}");
+
+                response.EnsureSuccessStatusCode();
+
+                var objectResponseWrapper =
+                    JsonConvert.DeserializeObject<ObjectResponseWrapper>(await response.Content.ReadAsStringAsync());
+
+                after = objectResponseWrapper?.Paging?.After ?? "";
+                hasMore = !string.IsNullOrWhiteSpace(after);
+
+                if (objectResponseWrapper?.Results.Count == 0)
+                {
+                    yield break;
+                }
+
+                foreach (var objectResponse in objectResponseWrapper?.Results)
+                {
+                    var recordMap = new Dictionary<string, object>();
+
+                    foreach (var objectProperty in objectResponse.Properties)
+                    {
+                        recordMap[objectProperty.Key] = objectProperty.Value.ToString() ?? "";
+                    }
+
+                    yield return new Record
+                    {
+                        Action = Record.Types.Action.Upsert,
+                        DataJson = JsonConvert.SerializeObject(recordMap)
+                    };
+                }
+            } while (hasMore);
         }
 
         public virtual Task<string> WriteRecordAsync(IApiClient apiClient, Schema schema, Record record,

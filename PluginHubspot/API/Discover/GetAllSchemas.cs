@@ -5,6 +5,7 @@ using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginHubspot.API.Factory;
 using PluginHubspot.API.Utility;
+using PluginHubspot.DataContracts;
 using PluginHubspot.Helper;
 
 namespace PluginHubspot.API.Discover
@@ -63,37 +64,29 @@ namespace PluginHubspot.API.Discover
                 return await endpoint.GetStaticSchemaAsync(apiClient, schema);
             }
 
-            var recordsListRaw = await endpoint.ReadRecordsAsync(apiClient, null, null, true).Take(100).ToListAsync();
-            var recordsList = recordsListRaw
-                .Select(r => JsonConvert.DeserializeObject<Dictionary<string, object>>(r.DataJson))
-                .ToList();
+            // invoke properties api
+            var response = await apiClient.GetAsync(endpoint.PropertiesPath);
 
-            var types = GetPropertyTypesFromRecords(recordsList);
-
-            var record = recordsList.FirstOrDefault();
+            var objectPropertiesResponse =
+                JsonConvert.DeserializeObject<PropertyResponseWrapper>(
+                    await response.Content.ReadAsStringAsync());
 
             var properties = new List<Property>();
 
-            if (record != null)
+            foreach (var objectProperty in objectPropertiesResponse.Results)
             {
-                foreach (var recordKey in record.Keys)
+                properties.Add(new Property
                 {
-                    var property = new Property
-                    {
-                        Id = recordKey,
-                        Name = recordKey,
-                        Type = types[recordKey],
-                        IsKey = endpoint.PropertyKeys.Contains(recordKey),
-                        IsCreateCounter = false,
-                        IsUpdateCounter = false,
-                        TypeAtSource = await endpoint.IsCustomProperty(apiClient, recordKey)
-                            ? Constants.CustomProperty
-                            : "",
-                        IsNullable = true
-                    };
-
-                    properties.Add(property);
-                }
+                    Id = objectProperty.Id,
+                    Name = objectProperty.Name,
+                    Description = objectProperty.Description,
+                    Type = GetPropertyType(objectProperty.Type),
+                    TypeAtSource = objectProperty.Type,
+                    IsKey = objectProperty.IsKey,
+                    IsNullable = !objectProperty.IsKey,
+                    IsCreateCounter = false,
+                    IsUpdateCounter = false,
+                });
             }
 
             schema.Properties.Clear();

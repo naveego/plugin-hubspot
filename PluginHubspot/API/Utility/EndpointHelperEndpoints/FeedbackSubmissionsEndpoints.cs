@@ -15,23 +15,25 @@ using PluginHubspot.DataContracts;
 
 namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
 {
-    public class CompaniesEndpointHelper
+    public class FeedbackSubmissionsEndpointHelper
     {
-        private class CompaniesEndpoint : Endpoint
+        
+
+        private class FeedbackSubmissionsEndpoint : Endpoint
         {
         }
 
-        public static readonly Dictionary<string, Endpoint> CompaniesEndpoints = new Dictionary<string, Endpoint>
+        public static readonly Dictionary<string, Endpoint> FeedbackSubmissionsEndpoints = new Dictionary<string, Endpoint>
         {
             {
-                "AllCompanies", new CompaniesEndpoint
+                "AllFeedbackSubmissions", new FeedbackSubmissionsEndpoint
                 {
-                    Id = "AllCompanies",
-                    Name = "All Companies",
+                    Id = "AllFeedbackSubmissions",
+                    Name = "All Feedback Submissions",
                     BasePath = "/crm/v3/",
-                    AllPath = "/objects/companies",
-                    PropertiesPath = "/crm/v3/properties/companies",
-                    DetailPath = "/objects/companies/{0}",
+                    AllPath = "/objects/feedback_submissions",
+                    PropertiesPath = "/crm/v3/properties/feedback_submissions",
+                    DetailPath = "/objects/feedback_submissions/{0}",
                     DetailPropertyId = "hs_unique_creation_key",
                     SupportedActions = new List<EndpointActions>
                     {

@@ -9,11 +9,11 @@ namespace PluginHubspot.API.Read
 {
     public static partial class Read
     {
-        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema, DateTime? lastReadTime = null, TaskCompletionSource<DateTime>? tcs = null)
+        public static async IAsyncEnumerable<Record> ReadRecordsAsync(IApiClient apiClient, Schema schema)
         {
             var endpoint = EndpointHelper.GetEndpointForSchema(schema);
 
-            var records = endpoint?.ReadRecordsAsync(apiClient, lastReadTime, tcs);
+            var records = endpoint?.ReadRecordsAsync(apiClient, schema);
 
             if (records != null)
             {
