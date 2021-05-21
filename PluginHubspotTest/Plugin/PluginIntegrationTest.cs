@@ -25,7 +25,7 @@ namespace PluginHubspotTest.Plugin
                 }
                 : new Settings
                 {
-                    ApiKey = "", // add to test
+                    ApiKey = "d2d4dfc6-02c9-44dd-bd55-a29d95249e43", // add to test
                 };
         }
 
@@ -209,7 +209,7 @@ namespace PluginHubspotTest.Plugin
 
             // assert
             Assert.IsType<DiscoverSchemasResponse>(response);
-            // Assert.Equal(2, response.Schemas.Count);
+            Assert.Equal(8, response.Schemas.Count);
             //
             // var schema = response.Schemas[0];
             // Assert.Equal($"cclf1", schema.Id);
@@ -352,10 +352,13 @@ namespace PluginHubspotTest.Plugin
             }
 
             // assert
-            Assert.Equal(2, records.Count);
+            Assert.Equal(1002, records.Count);
 
             var record = JsonConvert.DeserializeObject<Dictionary<string, object>>(records[0].DataJson);
-            // Assert.Equal("~", record["tilde"]);
+            Assert.Equal("Brisbane", record["city"]);
+            Assert.Equal("HubSpot", record["company"]);
+            Assert.Equal("Maria", record["firstname"]);
+            Assert.Equal("", record["work_email"]);
 
             // cleanup
             await channel.ShutdownAsync();

@@ -5,11 +5,11 @@ namespace PluginHubspot.DataContracts
 {
     public class ObjectResponseWrapper
     {
-        [JsonProperty("response")]
+        [JsonProperty("results")]
         public List<ObjectResponse> Results { get; set; }
         
         [JsonProperty("paging")]
-        public NextResponse Paging { get; set; }
+        public PagingResponse Paging { get; set; }
     }
 
     public class ObjectResponse
@@ -24,11 +24,11 @@ namespace PluginHubspot.DataContracts
 
     public class PropertyResponseWrapper
     {
-        [JsonProperty("response")]
+        [JsonProperty("results")]
         public List<PropertyResponse> Results { get; set; }
         
         [JsonProperty("paging")]
-        public NextResponse Paging { get; set; }
+        public PagingResponse Paging { get; set; }
     }
 
     public class PropertyResponse
@@ -57,10 +57,10 @@ namespace PluginHubspot.DataContracts
 
     public class NextResponse
     {
-        [JsonProperty("link")]
-        public string Link { get; set; }
-        
         [JsonProperty("after")]
         public string After { get; set; }
+        
+        [JsonProperty("link")]
+        public string Link { get; set; }
     }
 }

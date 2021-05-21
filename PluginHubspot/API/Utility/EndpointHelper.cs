@@ -85,14 +85,14 @@ namespace PluginHubspot.API.Utility
             do
             {
                 var response = await apiClient.GetAsync(
-                    $"{BasePath.TrimEnd('/')}/{AllPath.TrimStart('/')}?{string.Join(",",schema.Properties.Select(p => p.Id))}{(string.IsNullOrWhiteSpace(after) ? "" : $"&after={after}")}");
+                    $"{BasePath.TrimEnd('/')}/{AllPath.TrimStart('/')}?limit=100&properties={string.Join(",",schema.Properties.Select(p => p.Id))}{(string.IsNullOrWhiteSpace(after) ? "" : $"&after={after}")}");
 
                 response.EnsureSuccessStatusCode();
 
                 var objectResponseWrapper =
                     JsonConvert.DeserializeObject<ObjectResponseWrapper>(await response.Content.ReadAsStringAsync());
 
-                after = objectResponseWrapper?.Paging?.After ?? "";
+                after = objectResponseWrapper?.Paging?.Next?.After ?? "";
                 hasMore = !string.IsNullOrWhiteSpace(after);
 
                 if (objectResponseWrapper?.Results.Count == 0)
@@ -106,7 +106,15 @@ namespace PluginHubspot.API.Utility
 
                     foreach (var objectProperty in objectResponse.Properties)
                     {
-                        recordMap[objectProperty.Key] = objectProperty.Value.ToString() ?? "";
+                        try
+                        {
+                            recordMap[objectProperty.Key] = objectProperty.Value.ToString() ?? "";
+                        }
+                        catch
+                        {
+                            recordMap[objectProperty.Key] = "";
+                        }
+                        
                     }
 
                     yield return new Record
