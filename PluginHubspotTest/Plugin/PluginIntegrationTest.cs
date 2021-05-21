@@ -25,7 +25,7 @@ namespace PluginHubspotTest.Plugin
                 }
                 : new Settings
                 {
-                    ApiKey = "d2d4dfc6-02c9-44dd-bd55-a29d95249e43", // add to test
+                    ApiKey = "", // add to test
                 };
         }
 
