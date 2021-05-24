@@ -42,7 +42,27 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                         "hs_unique_creation_key"
                     }
                 }
-            }
+            },
+            {
+                "UpsertLineItems", new LineItemsEndpoint
+                {
+                    Id = "UpsertLineItems",
+                    Name = "Upsert Line Items",
+                    BasePath = "/crm/v3/objects/line_items",
+                    AllPath = "/",
+                    DetailPath = "/",
+                    DetailPropertyId = "hs_unique_creation_key",
+                    SupportedActions = new List<EndpointActions>
+                    {
+                        EndpointActions.Post,
+                        EndpointActions.Put
+                    },
+                    PropertyKeys = new List<string>
+                    {
+                        "hs_unique_creation_key"
+                    }
+                }
+            },
         };
     }
 }

@@ -44,7 +44,27 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                         "hs_unique_creation_key"
                     }
                 }
-            }
+            },
+            {
+                "UpsertFeedbackSubmissions", new FeedbackSubmissionsEndpoint
+                {
+                    Id = "UpsertFeedbackSubmissions",
+                    Name = "Upsert Feedback Submissions",
+                    BasePath = "/crm/v3/objects/feedback_submissions",
+                    AllPath = "/",
+                    DetailPath = "/",
+                    DetailPropertyId = "hs_unique_creation_key",
+                    SupportedActions = new List<EndpointActions>
+                    {
+                        EndpointActions.Post,
+                        EndpointActions.Put
+                    },
+                    PropertyKeys = new List<string>
+                    {
+                        "hs_unique_creation_key"
+                    }
+                }
+            },
         };
     }
 }

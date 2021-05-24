@@ -45,6 +45,9 @@ namespace PluginHubspot.DataContracts
         [JsonProperty("hasUniqueValue")]
         public bool IsKey { get; set; }
         
+        [JsonProperty("calculated")]
+        public bool Calculated { get; set; }
+        
         [JsonProperty("type")]
         public string Type { get; set; }
     }

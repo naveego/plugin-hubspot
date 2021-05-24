@@ -75,6 +75,12 @@ namespace PluginHubspot.API.Discover
 
             foreach (var objectProperty in objectPropertiesResponse.Results)
             {
+                var propertyMetaJson = new PropertyMetaJson
+                {
+                    Calculated = objectProperty.Calculated,
+                    IsKey = objectProperty.IsKey
+                };
+
                 properties.Add(new Property
                 {
                     Id = objectProperty.Id,
@@ -86,6 +92,7 @@ namespace PluginHubspot.API.Discover
                     IsNullable = !objectProperty.IsKey,
                     IsCreateCounter = false,
                     IsUpdateCounter = false,
+                    PublisherMetaJson = JsonConvert.SerializeObject(propertyMetaJson),
                 });
             }
 
