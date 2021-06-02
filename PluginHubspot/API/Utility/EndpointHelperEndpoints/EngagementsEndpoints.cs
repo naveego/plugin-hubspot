@@ -50,6 +50,7 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                     Name = "Upsert Engagements",
                     BasePath = "/crm/v3/objects/engagements",
                     AllPath = "/",
+                    PropertiesPath = "/crm/v3/properties/engagements",
                     DetailPath = "/",
                     DetailPropertyId = "hs_unique_creation_key",
                     SupportedActions = new List<EndpointActions>

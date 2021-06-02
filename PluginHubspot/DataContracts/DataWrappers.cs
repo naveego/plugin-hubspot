@@ -50,6 +50,9 @@ namespace PluginHubspot.DataContracts
         
         [JsonProperty("type")]
         public string Type { get; set; }
+        
+        [JsonProperty("modificationMetadata")]
+        public ModificationMetaData ModificationMetaData { get; set; }
     }
 
     public class PagingResponse

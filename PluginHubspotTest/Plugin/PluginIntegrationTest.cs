@@ -573,7 +573,7 @@ namespace PluginHubspotTest.Plugin
             var channel = new Channel($"localhost:{port}", ChannelCredentials.Insecure);
             var client = new Publisher.PublisherClient(channel);
 
-            var schema = GetTestSchema("UpsertSubscribers");
+            var schema = GetTestSchema("UpsertCompanies");
 
             var connectRequest = GetConnectSettings();
 
@@ -591,8 +591,16 @@ namespace PluginHubspotTest.Plugin
                         Action = Record.Types.Action.Upsert,
                         CorrelationId = "test",
                         RecordId = "record1",
-                        DataJson =
-                            "{\"Account PKey\":\"\",\"ZZN9X\":\"\",\"FirstName\":\"Molly\",\"LastName\":\"Male\",\"Owner Email\":null,\"Owner First Name\":\"Jenna\",\"Owner Last Name\":\"Jenna\",\"Phone\":\"(263) 83-25052\",\"IPAddress\":null,\"EmailAddress\":\"otgqeeld5@ofrb.zsamvv.net\",\"Lists\":\"[]\"}",
+                        DataJson = "{\"createdate\":\"2021-05-06T16:55:49.689Z\",\"domain\":\"sample.com\",\"hs_lastmodifieddate\":\"2021-05-06T16:56:10.131Z\",\"hs_object_id\":\"6021949042\",\"name\":\"Updated Sample Company\",\"hs_unique_creation_key\":\"6021949042\"}",
+                    }
+                },
+                {
+                    new Record
+                    {
+                        Action = Record.Types.Action.Upsert,
+                        CorrelationId = "test",
+                        RecordId = "record2",
+                        DataJson = "{\"domain\":\"newsample.com\",\"name\":\"New Sample Company\"}",
                     }
                 }
             };
@@ -639,7 +647,7 @@ namespace PluginHubspotTest.Plugin
             }
 
             // assert
-            Assert.Single(recordAcks);
+            Assert.Equal(2, recordAcks.Count);
             Assert.Equal("", recordAcks[0].Error);
             Assert.Equal("test", recordAcks[0].CorrelationId);
 

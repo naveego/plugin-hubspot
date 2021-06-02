@@ -50,6 +50,7 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                     Name = "Upsert Tickets",
                     BasePath = "/crm/v3/objects/tickets",
                     AllPath = "/",
+                    PropertiesPath = "/crm/v3/properties/tickets",
                     DetailPath = "/",
                     DetailPropertyId = "hs_unique_creation_key",
                     SupportedActions = new List<EndpointActions>

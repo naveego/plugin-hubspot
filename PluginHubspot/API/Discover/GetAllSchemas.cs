@@ -78,7 +78,8 @@ namespace PluginHubspot.API.Discover
                 var propertyMetaJson = new PropertyMetaJson
                 {
                     Calculated = objectProperty.Calculated,
-                    IsKey = objectProperty.IsKey
+                    IsKey = objectProperty.IsKey,
+                    ModificationMetaData = objectProperty.ModificationMetaData
                 };
 
                 properties.Add(new Property
@@ -103,6 +104,8 @@ namespace PluginHubspot.API.Discover
             {
                 schema.Description = Constants.EmptySchemaDescription;
             }
+
+            schema.DataFlowDirection = endpoint.GetDataFlowDirection();
 
             return schema;
         }

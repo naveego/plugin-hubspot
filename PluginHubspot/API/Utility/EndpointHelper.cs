@@ -65,7 +65,7 @@ namespace PluginHubspot.API.Utility
 
         protected virtual List<string> RequiredWritePropertyIds { get; set; } = new List<string>
         {
-            "hs_unique_creation_key"
+            // "hs_unique_creation_key"
         };
 
         public List<EndpointActions> SupportedActions { get; set; } = new List<EndpointActions>();
@@ -160,8 +160,7 @@ namespace PluginHubspot.API.Utility
                     return errorMessage;
                 }
             }
-
-            var writePathPropertyValue = recordMap[WritePathPropertyId];
+            
             var postObject = new Dictionary<string, object>();
 
             foreach (var property in schema.Properties)
@@ -169,8 +168,9 @@ namespace PluginHubspot.API.Utility
                 object value = "";
 
                 var propertyMetaJson = JsonConvert.DeserializeObject<PropertyMetaJson>(property.PublisherMetaJson);
+                var readOnlyProperty = propertyMetaJson?.ModificationMetaData?.ReadOnlyValue ?? false;
 
-                if (propertyMetaJson.Calculated || propertyMetaJson.IsKey)
+                if (propertyMetaJson.Calculated || propertyMetaJson.IsKey || readOnlyProperty || !recordMap.ContainsKey(property.Id))
                 {
                     continue;
                 }
@@ -183,8 +183,15 @@ namespace PluginHubspot.API.Utility
                 postObject.TryAdd(property.Id, value);
             }
 
+            var postObjectWrapper = new UpsertObjectWrapper
+            {
+                Properties = postObject
+            };
+
+            var objstr = JsonConvert.SerializeObject(postObjectWrapper);
+
             var json = new StringContent(
-                JsonConvert.SerializeObject(postObject),
+                JsonConvert.SerializeObject(postObjectWrapper),
                 Encoding.UTF8,
                 "application/json"
             );
@@ -200,7 +207,7 @@ namespace PluginHubspot.API.Utility
             else
             {
                 response =
-                    await apiClient.PutAsync($"{BasePath.TrimEnd('/')}/{recordMap[WritePathPropertyId]}", json);
+                    await apiClient.PatchAsync($"{BasePath.TrimEnd('/')}/{recordMap[WritePathPropertyId]}", json);
             }
 
             if (!response.IsSuccessStatusCode)

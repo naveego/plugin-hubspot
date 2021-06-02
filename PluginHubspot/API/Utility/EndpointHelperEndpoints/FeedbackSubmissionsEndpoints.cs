@@ -52,6 +52,7 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                     Name = "Upsert Feedback Submissions",
                     BasePath = "/crm/v3/objects/feedback_submissions",
                     AllPath = "/",
+                    PropertiesPath = "/crm/v3/properties/feedback_submissions",
                     DetailPath = "/",
                     DetailPropertyId = "hs_unique_creation_key",
                     SupportedActions = new List<EndpointActions>

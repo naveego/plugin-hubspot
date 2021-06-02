@@ -9,5 +9,20 @@ namespace PluginHubspot.DataContracts
         
         [JsonProperty("calculated")]
         public bool Calculated { get; set; }
+        
+        [JsonProperty("modificationMetadata")]
+        public ModificationMetaData ModificationMetaData { get; set; }
+    }
+
+    public class ModificationMetaData
+    {
+        [JsonProperty("archivable")]
+        public bool Archivable { get; set; }
+        
+        [JsonProperty("readOnlyDefinition")]
+        public bool ReadOnlyDefinition { get; set; }
+        
+        [JsonProperty("readOnlyValue")]
+        public bool ReadOnlyValue { get; set; }
     }
 }
