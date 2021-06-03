@@ -10,6 +10,7 @@
   "kind": "publisher",
   "os": "$GOOS",
   "arch": "$GOARCH",
+  "canConfigure": true,
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": false,
   "canUseOAuth": true,

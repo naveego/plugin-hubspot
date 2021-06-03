@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -66,6 +67,12 @@ namespace PluginHubspot.API.Discover
 
             // invoke properties api
             var response = await apiClient.GetAsync(endpoint.PropertiesPath);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = JsonConvert.DeserializeObject<ApiError>(await response.Content.ReadAsStringAsync());
+                throw new Exception(error.Message);
+            }
 
             var objectPropertiesResponse =
                 JsonConvert.DeserializeObject<PropertyResponseWrapper>(
