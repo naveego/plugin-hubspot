@@ -4,7 +4,7 @@
   "description": "Plugin for integrating data with Hubspot.com",
   "apiVersion": "2",
   "versionDescription": "Version 2",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "iconFile": "icon.jpg",
   "executable": "PluginHubspot",
   "kind": "publisher",
@@ -16,7 +16,22 @@
   "canUseOAuth": true,
   "canWrite": false,
   "configSchema": {
-    "ui": {},
-    "schema": {}
+    "ui": {
+      "ui:order": [
+        "ApiKey"
+      ]
+    },
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ApiKey" : {
+          "type": "string",
+          "title": "API Key",
+          "description": "(Optional) API key to use instead of using OAuth authentication."
+        }
+      },
+      "required": [
+      ]
+    }
   }
 }
