@@ -14,7 +14,7 @@
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": false,
   "canUseOAuth": true,
-  "canWrite": false,
+  "canWrite": true,
   "configSchema": {
     "ui": {
       "ui:order": [
