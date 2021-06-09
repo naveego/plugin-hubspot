@@ -75,8 +75,11 @@ namespace PluginHubspot.Plugin
             // params for auth url
             var clientId = request.Configuration.ClientId;
             var redirectUrl = request.RedirectUrl;
-            var scope = "oauth";
-            var optionalScope = "contacts%20content%20reports%20social%20automation%20timeline%20business-intelligence%20forms%20files%20hubdb%20transactional-email%20integration-sync%20tickets%20e-commerce%20accounting%20sales-email-read%20forms-uploaded-files%20crm.import%20files.ui_hidden.read%20crm.objects.marketing_events.read%20crm.objects.marketing_events.write%20crm.schemas.custom.read%20crm.objects.custom.read%20crm.objects.custom.write";
+            var scope = "contacts%20oauth%20tickets%20e-commerce";
+            var optionalScope = "";
+            
+            // var scope = "oauth";
+            // var optionalScope = "contacts%20content%20reports%20social%20automation%20timeline%20business-intelligence%20forms%20files%20hubdb%20transactional-email%20integration-sync%20tickets%20e-commerce%20accounting%20sales-email-read%20forms-uploaded-files%20crm.import%20files.ui_hidden.read%20crm.objects.marketing_events.read%20crm.objects.marketing_events.write%20crm.schemas.custom.read%20crm.objects.custom.read%20crm.objects.custom.write";
 
             // build auth url
             var authUrl = String.Format(
