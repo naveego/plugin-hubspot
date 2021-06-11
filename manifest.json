@@ -13,7 +13,7 @@
   "canConfigure": true,
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": false,
-  "canUseOAuth": true,
+  "canUseOAuth": false,
   "canWrite": true,
   "configSchema": {
     "ui": {
@@ -27,7 +27,7 @@
         "ApiKey" : {
           "type": "string",
           "title": "API Key",
-          "description": "(Optional) API key to use instead of using OAuth authentication."
+          "description": "API key to use for authentication."
         }
       },
       "required": [
