@@ -35,7 +35,7 @@ namespace PluginHubspot.Plugin
                 WriteConfigured = false
             };
         }
-        
+
         /// <summary>
         /// Configures the plugin
         /// </summary>
@@ -46,12 +46,12 @@ namespace PluginHubspot.Plugin
         {
             Logger.Debug("Got configure request");
             Logger.Debug(JsonConvert.SerializeObject(request, Formatting.Indented));
-            
+
             // ensure all directories are created
             Directory.CreateDirectory(request.TemporaryDirectory);
             Directory.CreateDirectory(request.PermanentDirectory);
             Directory.CreateDirectory(request.LogDirectory);
-            
+
             // configure logger
             Logger.SetLogLevel(request.LogLevel);
             Logger.Init(request.LogDirectory);
@@ -60,8 +60,8 @@ namespace PluginHubspot.Plugin
 
             return Task.FromResult(new ConfigureResponse());
         }
-        
-         /// <summary>
+
+        /// <summary>
         /// Creates an authorization url for oauth requests
         /// </summary>
         /// <param name="request"></param>
@@ -77,7 +77,7 @@ namespace PluginHubspot.Plugin
             var redirectUrl = request.RedirectUrl;
             var scope = "contacts%20oauth%20tickets%20e-commerce";
             var optionalScope = "";
-            
+
             // var scope = "oauth";
             // var optionalScope = "contacts%20content%20reports%20social%20automation%20timeline%20business-intelligence%20forms%20files%20hubdb%20transactional-email%20integration-sync%20tickets%20e-commerce%20accounting%20sales-email-read%20forms-uploaded-files%20crm.import%20files.ui_hidden.read%20crm.objects.marketing_events.read%20crm.objects.marketing_events.write%20crm.schemas.custom.read%20crm.objects.custom.read%20crm.objects.custom.write";
 
@@ -201,7 +201,7 @@ namespace PluginHubspot.Plugin
             // Logger.SetLogLevel(Logger.LogLevel.Debug);
 
             Logger.SetLogPrefix("connect");
-            
+
             // get oAuth State
             OAuthState oAuthState;
             OAuthConfig oAuthConfig;
@@ -221,15 +221,19 @@ namespace PluginHubspot.Plugin
                     SettingsError = ""
                 };
             }
-            
+
             // validate settings passed in
             try
             {
                 _server.Settings = JsonConvert.DeserializeObject<Settings>(request.SettingsJson);
-                _server.Settings.ClientId = request.OauthConfiguration.ClientId;
-                _server.Settings.ClientSecret = request.OauthConfiguration.ClientSecret;
-                _server.Settings.RefreshToken = oAuthState.RefreshToken;
-                _server.Settings.RedirectUri = oAuthConfig.RedirectUri;
+                if (string.IsNullOrWhiteSpace(_server.Settings.ApiKey))
+                {
+                    _server.Settings.ClientId = request.OauthConfiguration.ClientId;
+                    _server.Settings.ClientSecret = request.OauthConfiguration.ClientSecret;
+                    _server.Settings.RefreshToken = oAuthState.RefreshToken;
+                    _server.Settings.RedirectUri = oAuthConfig.RedirectUri;
+                }
+
                 _server.Settings.Validate();
             }
             catch (Exception e)
@@ -376,10 +380,11 @@ namespace PluginHubspot.Plugin
         /// <param name="request"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        public override Task<ConfigureRealTimeResponse> ConfigureRealTime(ConfigureRealTimeRequest request, ServerCallContext context)
+        public override Task<ConfigureRealTimeResponse> ConfigureRealTime(ConfigureRealTimeRequest request,
+            ServerCallContext context)
         {
             Logger.Info("Configuring real time...");
-            
+
             var schemaJson = Read.GetSchemaJson();
             var uiJson = Read.GetUIJson();
 
@@ -399,7 +404,7 @@ namespace PluginHubspot.Plugin
                     }
                 });
             }
-            
+
             return Task.FromResult(new ConfigureRealTimeResponse
             {
                 Form = new ConfigurationFormResponse
@@ -413,7 +418,7 @@ namespace PluginHubspot.Plugin
                 }
             });
         }
-        
+
         /// <summary>
         /// Publishes a stream of data for a given schema
         /// </summary>
@@ -433,7 +438,7 @@ namespace PluginHubspot.Plugin
                 long recordsCount = 0;
 
                 Logger.SetLogPrefix(jobId);
-                
+
                 Logger.Debug(JsonConvert.SerializeObject(request.RealTimeStateJson, Formatting.Indented));
 
                 if (!string.IsNullOrWhiteSpace(request.RealTimeSettingsJson))
@@ -457,7 +462,7 @@ namespace PluginHubspot.Plugin
                         recordsCount++;
                     }
                 }
-                
+
                 Logger.Info($"Published {recordsCount} records");
             }
             catch (Exception e)
@@ -465,7 +470,7 @@ namespace PluginHubspot.Plugin
                 Logger.Error(e, e.Message, context);
             }
         }
-        
+
         /// <summary>
         /// Prepares writeback settings to write to Campaigner
         /// </summary>
