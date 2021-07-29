@@ -4,7 +4,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
+using Grpc.Core;
 using Naveego.Sdk.Logging;
+using Naveego.Sdk.Plugins;
 using PluginHubspot.API.Utility;
 using PluginHubspot.Helper;
 
@@ -14,15 +16,17 @@ namespace PluginHubspot.API.Factory
     {
         private IApiAuthenticator Authenticator { get; set; }
         private static HttpClient Client { get; set; }
+        private IServerStreamWriter<ConnectResponse> ResponseStream { get; set; }
         private Settings Settings { get; set; }
 
         private const string ApiKeyParam = "hapikey";
 
-        public ApiClient(HttpClient client, Settings settings)
+        public ApiClient(HttpClient client, Settings settings, IServerStreamWriter<ConnectResponse> responseStream)
         {
-            Authenticator = new ApiAuthenticator(client, settings);
+            Authenticator = new ApiAuthenticator(client, settings, responseStream);
             Client = client;
             Settings = settings;
+            ResponseStream = responseStream;
             
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }

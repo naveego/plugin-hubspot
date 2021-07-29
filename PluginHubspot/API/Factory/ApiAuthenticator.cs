@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Grpc.Core;
 using Naveego.Sdk.Logging;
+using Naveego.Sdk.Plugins;
 using Newtonsoft.Json;
 using PluginHubspot.DataContracts;
 using PluginHubspot.Helper;
@@ -13,18 +15,20 @@ namespace PluginHubspot.API.Factory
     public class ApiAuthenticator: IApiAuthenticator
     {
         private HttpClient Client { get; set; }
+        private IServerStreamWriter<ConnectResponse> ResponseStream { get; set; }
         private Settings Settings { get; set; }
         private string Token { get; set; }
         private DateTime ExpiresAt { get; set; }
         
         private const string AuthUrl = "https://api.hubapi.com/oauth/v1/token";
         
-        public ApiAuthenticator(HttpClient client, Settings settings)
+        public ApiAuthenticator(HttpClient client, Settings settings,IServerStreamWriter<ConnectResponse> responseStream)
         {
             Client = client;
             Settings = settings;
             ExpiresAt = DateTime.Now;
             Token = "";
+            ResponseStream = responseStream;
         }
 
         public async Task<string> GetToken()
@@ -69,6 +73,30 @@ namespace PluginHubspot.API.Factory
                 // update expiration and saved token
                 ExpiresAt = DateTime.Now.AddSeconds(content.ExpiresIn);
                 Token = content.AccessToken;
+
+                var oAuthState = new OAuthState
+                {
+                    AuthToken = content.AccessToken,
+                    RefreshToken = content.RefreshToken,
+                    Config = JsonConvert.SerializeObject(new OAuthConfig
+                    {
+                        RedirectUri = Settings.RedirectUri
+                    })
+                };
+                
+                // update refresh token for next time
+                Settings.RefreshToken = content.RefreshToken;
+                
+                // write connect response
+                var connectResponse = new ConnectResponse
+                {
+                    OauthStateJson = JsonConvert.SerializeObject(oAuthState),
+                    ConnectionError = "",
+                    OauthError = "",
+                    SettingsError = ""
+                };
+
+                await ResponseStream.WriteAsync(connectResponse);
 
                 return Token;
             }

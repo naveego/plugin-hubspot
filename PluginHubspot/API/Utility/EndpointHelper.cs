@@ -61,7 +61,7 @@ namespace PluginHubspot.API.Utility
 
         public virtual bool ShouldGetStaticSchema { get; set; } = false;
 
-        protected virtual string WritePathPropertyId { get; set; } = "hs_unique_creation_key";
+        public virtual string WritePathPropertyId { get; set; } = "hs_unique_creation_key";
 
         protected virtual List<string> RequiredWritePropertyIds { get; set; } = new List<string>
         {

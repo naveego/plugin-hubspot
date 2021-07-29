@@ -303,6 +303,8 @@ namespace PluginHubspot.Plugin
             // create task to wait for disconnect to be called
             _tcs?.SetResult(true);
             _tcs = new TaskCompletionSource<bool>();
+            
+            _apiClientFactory.InitializeApiClientFactory(responseStream);
 
             // call connect method
             var response = await Connect(request, context);
