@@ -23,8 +23,8 @@ namespace PluginHubspot.API.Utility
             ContactsEndpointHelper.ContactsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             CompaniesEndpointHelper.CompaniesEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             DealsEndpointHelper.DealsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
-            EngagementsEndpointHelper.EngagementsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
-            FeedbackSubmissionsEndpointHelper.FeedbackSubmissionsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            // EngagementsEndpointHelper.EngagementsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
+            // FeedbackSubmissionsEndpointHelper.FeedbackSubmissionsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             LineItemsEndpointHelper.LineItemsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             ProductsEndpointHelper.ProductsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));
             TicketsEndpointHelper.TicketsEndpoints.ToList().ForEach(x => Endpoints.TryAdd(x.Key, x.Value));

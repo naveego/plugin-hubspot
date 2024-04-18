@@ -13,28 +13,23 @@
   "canConfigure": true,
   "canProduceMultipleSchemas": true,
   "canAcceptQueryBasedSchemas": false,
-  "canUseOAuth": false,
+  "canUseOAuth": true,
   "canWrite": true,
-  "configSchema": {
+  "querySchema": {
     "ui": {
-      "ui:order": [
-        "ApiKey"
-      ],
-      "ApiKey": {
-        "ui:widget": "password"
+      "ui:widget": "code",
+      "ui:options": {
+        "language": "sql"
       }
     },
     "schema": {
-      "type": "object",
-      "properties": {
-        "ApiKey" : {
-          "type": "string",
-          "title": "API Key",
-          "description": "API key to use for authentication."
-        }
-      },
-      "required": [
-      ]
+      "type": "string"
+    }
+  },
+  "configSchema": {
+    "ui": {
+    },
+    "schema": {
     }
   }
 }

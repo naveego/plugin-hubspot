@@ -75,7 +75,7 @@ namespace PluginHubspot.Plugin
             // params for auth url
             var clientId = request.Configuration.ClientId;
             var redirectUrl = request.RedirectUrl;
-            var scope = "contacts%20oauth%20tickets%20e-commerce";
+            var scope = "crm.objects.companies.read%20crm.objects.contacts.read%20crm.objects.contacts.write%20crm.objects.companies.write%20crm.objects.deals.read%20crm.objects.deals.write%20e-commerce%20tickets%20crm.objects.line_items.read%20crm.objects.line_items.write%20crm.objects.feedback_submissions.read";
             var optionalScope = "";
 
             // var scope = "oauth";
