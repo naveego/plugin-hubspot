@@ -470,6 +470,95 @@ namespace PluginHubspot.Plugin
                 Logger.Error(e, e.Message, context);
             }
         }
+        
+        /// <summary>
+        /// Creates a form and handles form updates for write backs
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override async Task<ConfigureWriteResponse> ConfigureWrite(ConfigureWriteRequest request,
+            ServerCallContext context)
+        {
+            Logger.Info("Configuring write...");
+            
+            var schemaJson = Write.GetSchemaJson();
+            var uiJson = Write.GetUIJson();
+            // Logger.Info($"json sent from plugin, schema:{schemaJson}, ------------ ui:{uiJson}");
+
+            // if first call 
+            if (string.IsNullOrWhiteSpace(request.Form.DataJson) || request.Form.DataJson == "{}")
+            {
+                return new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = "",
+                        DataErrorsJson = "",
+                        Errors = { },
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = ""
+                    },
+                    Schema = null
+                };
+            }
+
+            try
+            {
+                // get form data
+                Logger.Info($"form data:{request.Form.DataJson}, state:{request.Form.StateJson}");
+                var formData = JsonConvert.DeserializeObject<CustomWriteFormData>(request.Form.DataJson);
+                Logger.Info($"custom write:{formData.Hubspot.Endpoint}, settings:{formData.Hubspot.EndpointSettings.MembershipsSettings?.IlsId}");
+                var endpoint = Write.GetEndpointForCustomSchema(formData.Hubspot.Endpoint);
+                Logger.Info($"endpoint mapped:{JsonConvert.SerializeObject(endpoint)}");
+                var schema = new Schema
+                {
+                    Id = endpoint!.Id,
+                    Name = endpoint.Name,
+                    PublisherMetaJson = JsonConvert.SerializeObject(formData.Hubspot),
+                    DataFlowDirection = endpoint.GetDataFlowDirection(),
+                    Query = formData.Hubspot.EndpointSettings.MembershipsSettings?.IlsId
+                };
+                // Logger.Info($"publisher json:{schema.PublisherMetaJson}");
+                schema = await Discover.GetSchemaForEndpoint(_apiClient, schema, endpoint);
+                Logger.Info($"schema updated.....{JsonConvert.SerializeObject(schema)}");
+                // var storedProcedure = storedProcedures.Find(s => s.GetId() == formData.Hubspot);
+                
+                // base schema to return
+                // var schema = //await Write.GetSchemaForStoredProcedureAsync(_connectionFactory, storedProcedure, formData.GoldenRecordIdParam);
+
+                return new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = request.Form.DataJson,
+                        Errors = { },
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = request.Form.StateJson
+                    },
+                    Schema = schema
+                };
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, e.Message, context);
+                return new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = request.Form.DataJson,
+                        Errors = {e.Message},
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = request.Form.StateJson
+                    },
+                    Schema = null
+                };
+            }
+        }
+
 
         /// <summary>
         /// Prepares writeback settings to write to Campaigner
