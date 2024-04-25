@@ -82,22 +82,12 @@ namespace PluginHubspot.API.Write
                 {
                     "required", new[]
                     {
-                        "Endpoint"
+                        "Hubspot"
                     }
                 }
             };
 
             return JsonConvert.SerializeObject(schemaJsonObj);
-        }
-
-        public static Endpoint? GetEndpointForCustomSchema(string endpoint)
-        {
-            if (endpoint == Constants.EndpointMemberships)
-            {
-                return MembershipsEndpointHelper.MembershipsEndpoints.FirstOrDefault(x=> x.Key == "UpsertMemberships").Value ?? null;
-            }
-
-            return null;
         }
     }
 }

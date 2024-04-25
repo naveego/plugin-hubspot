@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using PluginHubspot.API.Discover;
 using PluginHubspot.API.Factory;
 using PluginHubspot.API.Read;
+using PluginHubspot.API.Utility;
 using PluginHubspot.API.Write;
 using PluginHubspot.DataContracts;
 using PluginHubspot.Helper;
@@ -75,7 +76,7 @@ namespace PluginHubspot.Plugin
             // params for auth url
             var clientId = request.Configuration.ClientId;
             var redirectUrl = request.RedirectUrl;
-            var scope = "crm.objects.companies.read%20crm.objects.contacts.read%20crm.objects.contacts.write%20crm.objects.companies.write%20crm.objects.deals.read%20crm.objects.deals.write%20e-commerce%20tickets%20crm.objects.line_items.read%20crm.objects.line_items.write%20crm.objects.feedback_submissions.read";
+            var scope = "crm.objects.line_items.read%20crm.objects.line_items.write%20tickets%20crm.objects.contacts.write%20e-commerce%20crm.objects.feedback_submissions.read%20crm.objects.companies.write%20crm.lists.write%20crm.objects.companies.read%20crm.lists.read%20crm.objects.deals.read%20crm.objects.deals.write%20crm.objects.contacts.read";
             var optionalScope = "";
 
             // var scope = "oauth";
@@ -484,7 +485,6 @@ namespace PluginHubspot.Plugin
             
             var schemaJson = Write.GetSchemaJson();
             var uiJson = Write.GetUIJson();
-            // Logger.Info($"json sent from plugin, schema:{schemaJson}, ------------ ui:{uiJson}");
 
             // if first call 
             if (string.IsNullOrWhiteSpace(request.Form.DataJson) || request.Form.DataJson == "{}")
@@ -507,26 +507,18 @@ namespace PluginHubspot.Plugin
             try
             {
                 // get form data
-                Logger.Info($"form data:{request.Form.DataJson}, state:{request.Form.StateJson}");
                 var formData = JsonConvert.DeserializeObject<CustomWriteFormData>(request.Form.DataJson);
-                Logger.Info($"custom write:{formData.Hubspot.Endpoint}, settings:{formData.Hubspot.EndpointSettings.MembershipsSettings?.IlsId}");
-                var endpoint = Write.GetEndpointForCustomSchema(formData.Hubspot.Endpoint);
-                Logger.Info($"endpoint mapped:{JsonConvert.SerializeObject(endpoint)}");
+                var endpoint = EndpointHelper.GetEndpointForCustomSchema(formData.Hubspot.Endpoint);
                 var schema = new Schema
                 {
                     Id = endpoint!.Id,
                     Name = endpoint.Name,
                     PublisherMetaJson = JsonConvert.SerializeObject(formData.Hubspot),
                     DataFlowDirection = endpoint.GetDataFlowDirection(),
-                    Query = formData.Hubspot.EndpointSettings.MembershipsSettings?.IlsId
+                    Query = ""
                 };
-                // Logger.Info($"publisher json:{schema.PublisherMetaJson}");
+
                 schema = await Discover.GetSchemaForEndpoint(_apiClient, schema, endpoint);
-                Logger.Info($"schema updated.....{JsonConvert.SerializeObject(schema)}");
-                // var storedProcedure = storedProcedures.Find(s => s.GetId() == formData.Hubspot);
-                
-                // base schema to return
-                // var schema = //await Write.GetSchemaForStoredProcedureAsync(_connectionFactory, storedProcedure, formData.GoldenRecordIdParam);
 
                 return new ConfigureWriteResponse
                 {
@@ -612,7 +604,7 @@ namespace PluginHubspot.Plugin
                     var record = requestStream.Current;
                     inCount++;
 
-                    Logger.Debug($"Got record: {record.DataJson}");
+                    Logger.Info($"Got record: {record.DataJson}");
 
                     if (_server.WriteSettings.IsReplication())
                     {

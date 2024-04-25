@@ -18,9 +18,18 @@
         public MembershipsSettings? MembershipsSettings { get; set; }
     }
 
-    public class MembershipsSettings
+    public class MembershipsSettings: IEndpointSettings
     {
         public string IlsId { get; set; }
         public bool DeleteDisabled { get; set; }
+        public bool IsValid()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    interface IEndpointSettings
+    {
+        public bool IsValid();
     }
 }
