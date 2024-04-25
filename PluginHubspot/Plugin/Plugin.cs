@@ -482,8 +482,9 @@ namespace PluginHubspot.Plugin
             ServerCallContext context)
         {
             Logger.Info("Configuring write...");
-            
-            var schemaJson = Write.GetSchemaJson();
+
+            var listIds = await Write.GetAllListId(_apiClient);
+            var schemaJson = await Write.GetSchemaJson(listIds);
             var uiJson = Write.GetUIJson();
 
             // if first call 

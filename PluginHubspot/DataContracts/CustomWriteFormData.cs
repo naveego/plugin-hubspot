@@ -1,4 +1,10 @@
-﻿namespace PluginHubspot.DataContracts
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using Newtonsoft.Json;
+
+namespace PluginHubspot.DataContracts
 {
     public class CustomWriteFormData
     {
@@ -18,18 +24,24 @@
         public MembershipsSettings? MembershipsSettings { get; set; }
     }
 
-    public class MembershipsSettings: IEndpointSettings
+    public class MembershipsSettings
     {
         public string IlsId { get; set; }
         public bool DeleteDisabled { get; set; }
-        public bool IsValid()
-        {
-            throw new System.NotImplementedException();
-        }
-    }
 
-    interface IEndpointSettings
-    {
-        public bool IsValid();
+        public string ParseIlsId()
+        {
+            return IlsId[(IlsId.LastIndexOf('(') + 1)..IlsId.LastIndexOf(')')];
+        }
+
+        // public bool IsValid()
+        // {
+        //     throw new System.NotImplementedException();
+        // }
     }
+    //
+    // interface IEndpointSettings
+    // {
+    //     public bool IsValid();
+    // }
 }

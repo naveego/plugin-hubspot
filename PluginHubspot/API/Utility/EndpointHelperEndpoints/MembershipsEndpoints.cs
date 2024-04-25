@@ -36,7 +36,7 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
 
                         
                         var publisherInfo = JsonConvert.DeserializeObject<Hubspot>(schema.PublisherMetaJson);
-                        var listId = publisherInfo.EndpointSettings.MembershipsSettings?.IlsId ?? "";
+                        var listId = publisherInfo.EndpointSettings.MembershipsSettings?.ParseIlsId() ?? "";
                         var deleteDisabled = publisherInfo.EndpointSettings.MembershipsSettings?.DeleteDisabled ?? true;
                         var url = string.Format(BasePath.TrimEnd('/'), listId);
 
