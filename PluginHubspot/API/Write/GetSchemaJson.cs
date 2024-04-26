@@ -33,6 +33,13 @@ namespace PluginHubspot.API.Write
                                     {"title", "Endpoint"},
                                     {"enum", new []{Constants.EndpointMemberships}}
                                 }},
+                                {"DeleteDisabled", new Dictionary<string, object>
+                                {
+                                    {"type", "boolean"},
+                                    {"title", "Disable Delete"},
+                                    {"description", "The plugin will not delete records from the memberships endpoint"},
+                                    {"default", true},
+                                }}
                             }},
                             {"required", new [] {"Endpoint"}},
                             {"dependencies", new Dictionary<string, object>
@@ -66,13 +73,6 @@ namespace PluginHubspot.API.Write
                                                                 {"description", "The ILS ID of the MANUAL or SNAPSHOT list."},
                                                                 {"enum", listIds}
                                                             }},
-                                                            {"DeleteDisabled", new Dictionary<string, object>
-                                                            {
-                                                                {"type", "boolean"},
-                                                                {"title", "Disable Delete"},
-                                                                {"description", "The plugin will not delete records from the memberships endpoint"},
-                                                                {"default", true},
-                                                            }}
                                                         }},
                                                         {"required", new []{"IlsId"}}
                                                     }}

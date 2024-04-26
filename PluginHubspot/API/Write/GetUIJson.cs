@@ -13,17 +13,17 @@ namespace PluginHubspot.API.Write
                 {
                     "Hubspot"
                 }},
-                // {"Hubspot", new Dictionary<string, object>
-                // {
-                //     {"ui:order", new []{"Endpoint", "EndpointSettings"}},
-                //     {"EndpointSettings", new Dictionary<string, object>
-                //     {
-                //         {"MembershipsSettings", new Dictionary<string, object>
-                //         {
-                //             {"ui:order", new []{"IlsId", "DeleteDisabled"}}
-                //         }}
-                //     }}
-                // }}
+                {"Hubspot", new Dictionary<string, object>
+                {
+                    {"ui:order", new []{"Endpoint","*", "DeleteDisabled"}},
+                    // {"EndpointSettings", new Dictionary<string, object>
+                    // {
+                    //     {"MembershipsSettings", new Dictionary<string, object>
+                    //     {
+                    //         {"ui:order", new []{"IlsId", "DeleteDisabled"}}
+                    //     }}
+                    // }}
+                }}
             };
             return JsonConvert.SerializeObject(uiJsonObj);
         }

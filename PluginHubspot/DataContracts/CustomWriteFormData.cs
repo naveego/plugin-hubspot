@@ -17,6 +17,7 @@ namespace PluginHubspot.DataContracts
     {
         public string Endpoint { get; set; }
         public EndpointSettings EndpointSettings { get; set; }
+        public bool DeleteDisabled { get; set; }
     }
 
     public class EndpointSettings
@@ -27,8 +28,6 @@ namespace PluginHubspot.DataContracts
     public class MembershipsSettings
     {
         public string IlsId { get; set; }
-        public bool DeleteDisabled { get; set; }
-
         public string ParseIlsId()
         {
             return IlsId[(IlsId.LastIndexOf('(') + 1)..IlsId.LastIndexOf(')')];
