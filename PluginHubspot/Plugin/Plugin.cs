@@ -484,7 +484,7 @@ namespace PluginHubspot.Plugin
             Logger.Info("Configuring write...");
 
             var listIds = await Write.GetAllListId(_apiClient);
-            var schemaJson = await Write.GetSchemaJson(listIds);
+            var schemaJson = Write.GetSchemaJson(listIds);
             var uiJson = Write.GetUIJson();
 
             // if first call 
@@ -604,8 +604,6 @@ namespace PluginHubspot.Plugin
                 {
                     var record = requestStream.Current;
                     inCount++;
-
-                    Logger.Info($"Got record: {record.DataJson}");
 
                     if (_server.WriteSettings.IsReplication())
                     {

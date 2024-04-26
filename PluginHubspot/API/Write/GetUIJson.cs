@@ -15,14 +15,10 @@ namespace PluginHubspot.API.Write
                 }},
                 {"Hubspot", new Dictionary<string, object>
                 {
-                    {"ui:order", new []{"Endpoint","*", "DeleteDisabled"}},
-                    // {"EndpointSettings", new Dictionary<string, object>
-                    // {
-                    //     {"MembershipsSettings", new Dictionary<string, object>
-                    //     {
-                    //         {"ui:order", new []{"IlsId", "DeleteDisabled"}}
-                    //     }}
-                    // }}
+                    {"ui:order", new []
+                    {
+                        "Endpoint","*"
+                    }},
                 }}
             };
             return JsonConvert.SerializeObject(uiJsonObj);

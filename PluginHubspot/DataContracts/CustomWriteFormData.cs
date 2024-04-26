@@ -9,15 +9,12 @@ namespace PluginHubspot.DataContracts
     public class CustomWriteFormData
     {
         public Hubspot Hubspot { get; set; }
-        // public string Endpoint { get; set; }
-        // public EndpointSettings EndpointSettings { get; set; }
     }
 
     public class Hubspot
     {
         public string Endpoint { get; set; }
         public EndpointSettings EndpointSettings { get; set; }
-        public bool DeleteDisabled { get; set; }
     }
 
     public class EndpointSettings
@@ -32,15 +29,5 @@ namespace PluginHubspot.DataContracts
         {
             return IlsId[(IlsId.LastIndexOf('(') + 1)..IlsId.LastIndexOf(')')];
         }
-
-        // public bool IsValid()
-        // {
-        //     throw new System.NotImplementedException();
-        // }
     }
-    //
-    // interface IEndpointSettings
-    // {
-    //     public bool IsValid();
-    // }
 }

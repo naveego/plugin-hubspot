@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Naveego.Sdk.Logging;
 using Newtonsoft.Json;
 using PluginHubspot.API.Factory;
 using PluginHubspot.API.Utility;
-using PluginHubspot.API.Utility.EndpointHelperEndpoints;
-using PluginHubspot.DataContracts;
 
 namespace PluginHubspot.API.Write
 {
     public static partial class Write
     {
-        public static async Task<string> GetSchemaJson(string [] listIds)
+        public static string GetSchemaJson(string [] listIds)
         {
             var schemaJsonObj = new Dictionary<string, object>
             {
@@ -33,13 +28,6 @@ namespace PluginHubspot.API.Write
                                     {"title", "Endpoint"},
                                     {"enum", new []{Constants.EndpointMemberships}}
                                 }},
-                                {"DeleteDisabled", new Dictionary<string, object>
-                                {
-                                    {"type", "boolean"},
-                                    {"title", "Disable Delete"},
-                                    {"description", "The plugin will not delete records from the memberships endpoint"},
-                                    {"default", true},
-                                }}
                             }},
                             {"required", new [] {"Endpoint"}},
                             {"dependencies", new Dictionary<string, object>
@@ -57,7 +45,7 @@ namespace PluginHubspot.API.Write
                                             {"EndpointSettings", new Dictionary<string, object>
                                             {
                                                 {"type", "object"},
-                                                {"title", ""},
+                                                {"title", "Endpoint Settings"},
                                                 {"properties", new Dictionary<string, object>
                                                 {
                                                     {"MembershipsSettings", new Dictionary<string, object>
@@ -69,8 +57,8 @@ namespace PluginHubspot.API.Write
                                                             {"IlsId", new Dictionary<string, object>
                                                             {
                                                                 {"type", "string"},
-                                                                {"title", "ILS ID"},
-                                                                {"description", "The ILS ID of the MANUAL or SNAPSHOT list."},
+                                                                {"title", "Target membership list in Hubspot"},
+                                                                {"description", "Name of the Hubspot list with ILS ID in parenthesis"},
                                                                 {"enum", listIds}
                                                             }},
                                                         }},
@@ -106,28 +94,17 @@ namespace PluginHubspot.API.Write
                 Encoding.UTF8,
                 "application/json"
             );
-            try
-            {
-                Logger.Info($"going to invoke the endpoint..");
-                var response = await client.PostAsync(path, json);
-                var result = await response.Content.ReadAsStringAsync();
-                Logger.Info($"response for list:{result}");
-                var obj = JsonConvert.DeserializeObject<dynamic>(result);
-                Logger.Info($"offset:{obj?.offset}, {JsonConvert.SerializeObject(obj?.lists)}");
-                var lists = obj?.lists;
+            var response = await client.PostAsync(path, json);
+            var result = await response.Content.ReadAsStringAsync();
+            var obj = JsonConvert.DeserializeObject<dynamic>(result);
+            var lists = obj?.lists;
 
-                if (lists != null)
-                    foreach (var list in lists)
-                    {
-                        listIds.Add($"{list.name.ToString()} ({list.listId.ToString()})");
-                    }
-            }
-            catch (Exception e)
+            if (lists == null) return listIds.ToArray();
+            
+            foreach (var list in lists)
             {
-                Logger.Info($"error in :{e.Message}");
-                // throw;
+                listIds.Add($"{list.name.ToString()} ({list.listId.ToString()})");
             }
-
             return listIds.ToArray();
         }
 

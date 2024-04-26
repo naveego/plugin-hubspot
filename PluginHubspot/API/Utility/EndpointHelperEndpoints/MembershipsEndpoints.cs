@@ -22,84 +22,65 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                 var recordMap = JsonConvert.DeserializeObject<Dictionary<string, object>>(record.DataJson);
                 var hasRecordId = recordMap.TryGetValue("recordId", out var recordId);
                 var errorMessage = "";
-                HttpResponseMessage? response = null;
 
-                if (hasRecordId)
-                {
-                    if (recordId is string _)
-                    {
-                        var json = new StringContent(
-                            $"[\"{recordId}\"]",
-                            Encoding.UTF8,
-                            "application/json"
-                        );
-
-                        
-                        var publisherInfo = JsonConvert.DeserializeObject<Hubspot>(schema.PublisherMetaJson);
-                        var listId = publisherInfo.EndpointSettings.MembershipsSettings?.ParseIlsId() ?? "";
-                        var deleteDisabled = publisherInfo?.DeleteDisabled ?? true;
-                        var url = string.Format(BasePath.TrimEnd('/'), listId);
-
-                        if (record.Action == Record.Types.Action.Delete)
-                        {
-                            if (!deleteDisabled)
-                            {
-                                url = $"{url}/remove";
-                                response = await apiClient.PutAsync(url, json);
-                            }
-                            else
-                            {
-                                errorMessage = $"Writeback is not allowed to delete record";
-                            }
-                        }
-                        else
-                        {
-                            url = $"{url}/add";
-                            response = await apiClient.PutAsync(url, json);
-                        }
-                    }
-                    else
-                    {
-                        errorMessage = $"Required property recordId was NULL";
-                    }
-                }
-                else
+                if (!hasRecordId)
                 {
                     errorMessage = $"Record did not contain required property recordId";
                 }
-
-                if (string.IsNullOrEmpty(errorMessage))
+                else if (!(recordId is string _))
                 {
-                    if (response == null)
+                    errorMessage = $"Required property recordId was NULL";
+                }
+                else
+                {
+                    var json = new StringContent(
+                        $"[\"{recordId}\"]",
+                        Encoding.UTF8,
+                        "application/json"
+                    );
+                    
+                    var publisherInfo = JsonConvert.DeserializeObject<Hubspot>(schema.PublisherMetaJson);
+                    var listId = publisherInfo.EndpointSettings.MembershipsSettings?.ParseIlsId() ?? "";
+                    var url = string.Format(BasePath.TrimEnd('/'), listId);
+                    Logger.Info($"list id:{listId}, record id:{recordId}, action:{record.Action}");
+                    
+                    HttpResponseMessage response;
+                    if (record.Action == Record.Types.Action.Delete)
                     {
-                        errorMessage = $"The endpoint is not reachable";
+                        url = $"{url}/remove";
+                        response = await apiClient.PutAsync(url, json);
                     }
-                    else if (!response.IsSuccessStatusCode)
+                    else
+                    {
+                        url = $"{url}/add";
+                        response = await apiClient.PutAsync(url, json);
+                    }
+
+                    if (!response.IsSuccessStatusCode)
                     {
                         errorMessage = await response.Content.ReadAsStringAsync();
                     }
                 }
 
-                if (string.IsNullOrEmpty(errorMessage))
+                if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    var ack = new RecordAck
+                    var errorAck = new RecordAck
                     {
                         CorrelationId = record.CorrelationId,
-                        Error = ""
+                        Error = errorMessage
                     };
-                    await responseStream.WriteAsync(ack);
+                    await responseStream.WriteAsync(errorAck);
 
-                    return "";
+                    return errorMessage;
                 }
 
-                var errorAck = new RecordAck
+                var ack = new RecordAck
                 {
                     CorrelationId = record.CorrelationId,
-                    Error = errorMessage
+                    Error = ""
                 };
-                await responseStream.WriteAsync(errorAck);
-
-                return errorMessage;
+                await responseStream.WriteAsync(ack);
+                return "";
             }
 
             public override Task<Schema> GetStaticSchemaAsync(IApiClient apiClient, Schema schema)
