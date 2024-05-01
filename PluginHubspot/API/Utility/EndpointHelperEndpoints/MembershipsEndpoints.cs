@@ -88,7 +88,7 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                 schema.Properties.Add(new Property
                 {
                     Id = "recordId",
-                    Name = "recordId",
+                    Name = "Record ID",
                     Type = PropertyType.String,
                     IsKey = true
                 });
