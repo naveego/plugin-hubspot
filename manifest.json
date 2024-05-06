@@ -15,6 +15,7 @@
   "canAcceptQueryBasedSchemas": false,
   "canUseOAuth": true,
   "canWrite": true,
+  "CanConfigureWrite": true,
   "querySchema": {
     "ui": {
       "ui:widget": "code",

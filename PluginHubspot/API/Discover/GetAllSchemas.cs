@@ -53,7 +53,7 @@ namespace PluginHubspot.API.Discover
             return schema;
         }
 
-        private static async Task<Schema> GetSchemaForEndpoint(IApiClient apiClient, Schema schema, Endpoint? endpoint)
+        public static async Task<Schema> GetSchemaForEndpoint(IApiClient apiClient, Schema schema, Endpoint? endpoint)
         {
             if (endpoint == null)
             {

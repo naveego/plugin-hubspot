@@ -32,7 +32,7 @@ namespace PluginHubspot.API.Write
                 }
 
                 // debug
-                Logger.Debug(JsonConvert.SerializeObject(record, Formatting.Indented));
+                Logger.Debug($"endpoint:{endpoint.Name}, {JsonConvert.SerializeObject(record, Formatting.Indented)}");
 
                 // semaphore
                 await WriteSemaphoreSlim.WaitAsync();

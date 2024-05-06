@@ -37,15 +37,32 @@ namespace PluginHubspot.API.Utility
 
         public static Endpoint? GetEndpointForId(string id)
         {
-            return Endpoints.ContainsKey(id) ? Endpoints[id] : null;
+            return Endpoints.TryGetValue(id, out var endpoint) ? endpoint : null;
         }
 
         public static Endpoint? GetEndpointForSchema(Schema schema)
         {
             var endpointMetaJson = JsonConvert.DeserializeObject<dynamic>(schema.PublisherMetaJson);
             string endpointId = endpointMetaJson.Id;
+            if (string.IsNullOrEmpty(endpointId))
+            {
+                // possibly a custom schema, so contains Hubspot object
+                return GetEndpointForCustomSchema(endpointMetaJson.Endpoint.ToString());
+            }
+
             return GetEndpointForId(endpointId);
         }
+        
+        public static Endpoint? GetEndpointForCustomSchema(string endpoint)
+        {
+            if (endpoint == Constants.EndpointMemberships)
+            {
+                return MembershipsEndpointHelper.MembershipsEndpoints.FirstOrDefault(x=> x.Key == "UpsertMemberships").Value ?? null;
+            }
+
+            return null;
+        }
+
     }
 
     public abstract class Endpoint

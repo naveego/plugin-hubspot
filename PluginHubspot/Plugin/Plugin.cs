@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using PluginHubspot.API.Discover;
 using PluginHubspot.API.Factory;
 using PluginHubspot.API.Read;
+using PluginHubspot.API.Utility;
 using PluginHubspot.API.Write;
 using PluginHubspot.DataContracts;
 using PluginHubspot.Helper;
@@ -75,7 +76,7 @@ namespace PluginHubspot.Plugin
             // params for auth url
             var clientId = request.Configuration.ClientId;
             var redirectUrl = request.RedirectUrl;
-            var scope = "crm.objects.companies.read%20crm.objects.contacts.read%20crm.objects.contacts.write%20crm.objects.companies.write%20crm.objects.deals.read%20crm.objects.deals.write%20e-commerce%20tickets%20crm.objects.line_items.read%20crm.objects.line_items.write%20crm.objects.feedback_submissions.read";
+            var scope = "crm.objects.line_items.read%20crm.objects.line_items.write%20tickets%20crm.objects.contacts.write%20e-commerce%20crm.objects.feedback_submissions.read%20crm.objects.companies.write%20crm.lists.write%20crm.objects.companies.read%20crm.lists.read%20crm.objects.deals.read%20crm.objects.deals.write%20crm.objects.contacts.read";
             var optionalScope = "";
 
             // var scope = "oauth";
@@ -470,6 +471,87 @@ namespace PluginHubspot.Plugin
                 Logger.Error(e, e.Message, context);
             }
         }
+        
+        /// <summary>
+        /// Creates a form and handles form updates for write backs
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public override async Task<ConfigureWriteResponse> ConfigureWrite(ConfigureWriteRequest request,
+            ServerCallContext context)
+        {
+            Logger.Info("Configuring write...");
+
+            var listIds = await Write.GetAllListId(_apiClient);
+            var schemaJson = Write.GetSchemaJson(listIds);
+            var uiJson = Write.GetUIJson();
+
+            // if first call 
+            if (string.IsNullOrWhiteSpace(request.Form.DataJson) || request.Form.DataJson == "{}")
+            {
+                return new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = "",
+                        DataErrorsJson = "",
+                        Errors = { },
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = ""
+                    },
+                    Schema = null
+                };
+            }
+
+            try
+            {
+                // get form data
+                var formData = JsonConvert.DeserializeObject<CustomWriteFormData>(request.Form.DataJson);
+                var endpoint = EndpointHelper.GetEndpointForCustomSchema(formData.Hubspot.Endpoint);
+                var schema = new Schema
+                {
+                    Id = endpoint!.Id,
+                    Name = endpoint.Name,
+                    PublisherMetaJson = JsonConvert.SerializeObject(formData.Hubspot),
+                    DataFlowDirection = endpoint.GetDataFlowDirection(),
+                    Query = ""
+                };
+
+                schema = await Discover.GetSchemaForEndpoint(_apiClient, schema, endpoint);
+
+                return new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = request.Form.DataJson,
+                        Errors = { },
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = request.Form.StateJson
+                    },
+                    Schema = schema
+                };
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, e.Message, context);
+                return new ConfigureWriteResponse
+                {
+                    Form = new ConfigurationFormResponse
+                    {
+                        DataJson = request.Form.DataJson,
+                        Errors = {e.Message},
+                        SchemaJson = schemaJson,
+                        UiJson = uiJson,
+                        StateJson = request.Form.StateJson
+                    },
+                    Schema = null
+                };
+            }
+        }
+
 
         /// <summary>
         /// Prepares writeback settings to write to Campaigner
@@ -522,8 +604,6 @@ namespace PluginHubspot.Plugin
                 {
                     var record = requestStream.Current;
                     inCount++;
-
-                    Logger.Debug($"Got record: {record.DataJson}");
 
                     if (_server.WriteSettings.IsReplication())
                     {
