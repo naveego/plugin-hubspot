@@ -58,7 +58,7 @@ namespace PluginHubspot.API.Write
                                                             {
                                                                 {"type", "string"},
                                                                 {"title", "Target membership list in Hubspot"},
-                                                                {"description", "Name of the Hubspot list with ID in parenthesis"},
+                                                                {"description", "Name of the Hubspot target list with ID in parenthesis."},
                                                                 {"enum", listIds}
                                                             }},
                                                         }},
