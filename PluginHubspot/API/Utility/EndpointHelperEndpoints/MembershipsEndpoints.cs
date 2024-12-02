@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,13 +38,12 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                         Encoding.UTF8,
                         "application/json"
                     );
-
-                    var publisherInfo = JsonConvert.DeserializeObject<CustomWriteFormData>(schema.PublisherMetaJson);
-                    var manualIlsId = publisherInfo.MembershipsSettings?.ManualIlsId ?? "";
-                    var listId = string.IsNullOrWhiteSpace(manualIlsId) ? publisherInfo.MembershipsSettings?.ParseIlsId() ?? "" : manualIlsId.Trim();
+                    
+                    var publisherInfo = JsonConvert.DeserializeObject<Hubspot>(schema.PublisherMetaJson);
+                    var listId = publisherInfo.EndpointSettings.MembershipsSettings?.ParseIlsId() ?? "";
                     var url = string.Format(BasePath.TrimEnd('/'), listId);
                     Logger.Info($"list id:{listId}, record id:{recordId}, action:{record.Action}");
-
+                    
                     HttpResponseMessage response;
                     if (record.Action == Record.Types.Action.Delete)
                     {
@@ -122,36 +122,5 @@ namespace PluginHubspot.API.Utility.EndpointHelperEndpoints
                 }
             },
         };
-
-        public static async Task<List<string>> GetAllListId(IApiClient client)
-        {
-            var listIds = new List<string> ();
-            const string path = "crm/v3/lists/search";
-            var json = new StringContent(
-                "{\"listIds\":[],\"offset\":0,\"processingTypes\":[\"MANUAL\", \"SNAPSHOT\"]}",
-                Encoding.UTF8,
-                "application/json"
-            );
-            var response = await client.PostAsync(path, json);
-            var result = await response.Content.ReadAsStringAsync();
-            var obj = JsonConvert.DeserializeObject<dynamic>(result);
-            var lists = obj?.lists;
-
-            if (lists == null) return listIds;
-
-            foreach (var list in lists)
-            {
-                listIds.Add($"{list!.name.ToString()} ({list.listId.ToString()})");
-            }
-            return listIds;
-        }
-
-        public static async Task<bool> DoListExist(IApiClient client, string listId)
-        {
-            var path = $"crm/v3/lists/{listId}";
-            var response = await client.GetAsync(path);
-            return response.IsSuccessStatusCode;
-        }
-
     }
 }

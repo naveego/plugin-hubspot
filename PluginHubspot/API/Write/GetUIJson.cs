@@ -7,8 +7,20 @@ namespace PluginHubspot.API.Write
     {
         public static string GetUIJson()
         {
-            var uiJsonObj = new Dictionary<string, object>{};
-            
+            var uiJsonObj = new Dictionary<string, object>
+            {
+                {"ui:order", new []
+                {
+                    "Hubspot"
+                }},
+                {"Hubspot", new Dictionary<string, object>
+                {
+                    {"ui:order", new []
+                    {
+                        "Endpoint","*"
+                    }},
+                }}
+            };
             return JsonConvert.SerializeObject(uiJsonObj);
         }
     }
