@@ -14,6 +14,7 @@ using PluginHubspot.API.Discover;
 using PluginHubspot.API.Factory;
 using PluginHubspot.API.Read;
 using PluginHubspot.API.Utility;
+using PluginHubspot.API.Utility.EndpointHelperEndpoints;
 using PluginHubspot.API.Write;
 using PluginHubspot.DataContracts;
 using PluginHubspot.Helper;
@@ -329,7 +330,7 @@ namespace PluginHubspot.Plugin
             Logger.SetLogPrefix("discover");
             Logger.Info("Discovering Schemas...");
 
-            var sampleSize = checked((int) request.SampleSize);
+            var sampleSize = checked((int)request.SampleSize);
 
             DiscoverSchemasResponse discoverSchemasResponse = new DiscoverSchemasResponse();
 
@@ -483,7 +484,7 @@ namespace PluginHubspot.Plugin
         {
             Logger.Info("Configuring write...");
 
-            var listIds = await Write.GetAllListId(_apiClient);
+            var listIds = await MembershipsEndpointHelper.GetAllListId(_apiClient);
             var schemaJson = Write.GetSchemaJson(listIds);
             var uiJson = Write.GetUIJson();
 
@@ -509,12 +510,39 @@ namespace PluginHubspot.Plugin
             {
                 // get form data
                 var formData = JsonConvert.DeserializeObject<CustomWriteFormData>(request.Form.DataJson);
-                var endpoint = EndpointHelper.GetEndpointForCustomSchema(formData.Hubspot.Endpoint);
+
+                if (formData.Endpoint == Constants.EndpointMemberships)
+                {
+                    if (formData.MembershipsSettings == null)
+                    {
+                        throw new Exception("Invalid endpoint settings!");
+                    }
+                    else
+                    {
+                        var ilsId = formData.MembershipsSettings.IlsId;
+                        var manualIlsId = formData.MembershipsSettings.ManualIlsId;
+                        if (string.IsNullOrWhiteSpace(ilsId) && string.IsNullOrWhiteSpace(manualIlsId))
+                        {
+                            throw new Exception("A valid list ID is required!");
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(manualIlsId))
+                        {
+                            var doListExist = await MembershipsEndpointHelper.DoListExist(_apiClient, manualIlsId.Trim());
+                            if (!doListExist)
+                            {
+                                throw new Exception("List ID does not exist!");
+                            }
+                        }
+                    }
+                }
+
+                var endpoint = EndpointHelper.GetEndpointForCustomSchema(formData.Endpoint);
                 var schema = new Schema
                 {
                     Id = endpoint!.Id,
                     Name = endpoint.Name,
-                    PublisherMetaJson = JsonConvert.SerializeObject(formData.Hubspot),
+                    PublisherMetaJson = JsonConvert.SerializeObject(formData),
                     DataFlowDirection = endpoint.GetDataFlowDirection(),
                     Query = ""
                 };
@@ -542,7 +570,7 @@ namespace PluginHubspot.Plugin
                     Form = new ConfigurationFormResponse
                     {
                         DataJson = request.Form.DataJson,
-                        Errors = {e.Message},
+                        Errors = { e.Message },
                         SchemaJson = schemaJson,
                         UiJson = uiJson,
                         StateJson = request.Form.StateJson
