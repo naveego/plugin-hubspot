@@ -41,19 +41,19 @@ namespace PluginHubspot.API.Write
                                 {
                                     {"type", "object"},
                                     {"title", "Target membership list in Hubspot"},
-                                    {"description", "Either select a target list from the dropdown below or manually enter a list ID within the field below."},
+                                    {"description", "Either select a target ILS list ID from the dropdown below or manually enter an ILS list ID within the field below."},
                                     {"properties", new Dictionary<string, object>
                                     {
                                         {"IlsId", new Dictionary<string, object>
                                         {
                                             {"type", "string"},
-                                            {"title", "NAME OF THE HUBSPOT TARGET LIST WITH ID IN PARETHESIS (LIMITED UP TO 20 RESULTS)."},
+                                            {"title", "NAME OF THE HUBSPOT TARGET LIST WITH ILS ID IN PARENTHESES (LIMITED UP TO 20 RESULTS)."},
                                             {"enum", listIdsInDropdown}
                                         }},
                                         {"ManualIlsId", new Dictionary<string, object>
                                         {
                                             {"type", "string"},
-                                            {"title", "MANUALLY ENTER LIST ID."},
+                                            {"title", "MANUALLY ENTER THE ILS LIST ID."},
                                         }},
                                     }},
                                 }}
