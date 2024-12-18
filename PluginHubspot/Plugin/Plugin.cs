@@ -523,7 +523,7 @@ namespace PluginHubspot.Plugin
                         var manualIlsId = formData.MembershipsSettings.ManualIlsId;
                         if (string.IsNullOrWhiteSpace(ilsId) && string.IsNullOrWhiteSpace(manualIlsId))
                         {
-                            throw new Exception("A valid list ID is required!");
+                            throw new Exception("A valid ILS list ID is required!");
                         }
 
                         if (!string.IsNullOrWhiteSpace(manualIlsId))
@@ -531,7 +531,7 @@ namespace PluginHubspot.Plugin
                             var doListExist = await MembershipsEndpointHelper.DoListExist(_apiClient, manualIlsId.Trim());
                             if (!doListExist)
                             {
-                                throw new Exception("List ID does not exist!");
+                                throw new Exception("ILS list ID does not exist!");
                             }
                         }
                     }
