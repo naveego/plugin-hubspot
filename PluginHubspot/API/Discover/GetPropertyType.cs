@@ -4,8 +4,13 @@ namespace PluginHubspot.API.Discover
 {
     public static partial class Discover
     {
-        public static PropertyType GetPropertyType(string dataType)
+        public static PropertyType GetPropertyType(string dataType, bool forRead = true)
         {
+            if (forRead)
+            {
+                return PropertyType.String;
+            }
+            
             switch (dataType?.ToLower())
             {
                 case "number":
