@@ -8,6 +8,7 @@ using PluginHubspot.API.Factory;
 using PluginHubspot.API.Utility;
 using PluginHubspot.DataContracts;
 using PluginHubspot.Helper;
+using static Naveego.Sdk.Plugins.Schema.Types;
 
 namespace PluginHubspot.API.Discover
 {
@@ -94,7 +95,7 @@ namespace PluginHubspot.API.Discover
                     Id = objectProperty.Id,
                     Name = objectProperty.Name,
                     Description = objectProperty.Description,
-                    Type = GetPropertyType(objectProperty.Type),
+                    Type = GetPropertyType(objectProperty.Type, (schema?.DataFlowDirection ?? DataFlowDirection.Read) == DataFlowDirection.Read),
                     TypeAtSource = objectProperty.Type,
                     IsKey = objectProperty.IsKey,
                     IsNullable = !objectProperty.IsKey,
